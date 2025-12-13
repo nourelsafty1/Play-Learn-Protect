@@ -20,6 +20,7 @@ const GameDetailPage = () => {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId]);
 
   const fetchData = async () => {
@@ -99,13 +100,25 @@ const GameDetailPage = () => {
           <div className="lg:col-span-2">
             <Card>
               {/* Game Banner */}
-              <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-purple-400 to-pink-400 h-64 flex items-center justify-center mb-6">
-                {game.thumbnail ? (
-                  <img src={game.thumbnail} alt={game.title} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-8xl">🎮</div>
-                )}
-                <div className={`absolute top-4 right-4 px-4 py-2 rounded-full text-white font-semibold ${getCategoryColor(game.category)}`}>
+              <div
+                className={`relative mb-4 rounded-lg overflow-hidden h-64 flex items-center justify-center ${getCategoryColor(
+                  game.category
+                )}`}
+              >
+                <div className="text-8xl">
+                  {game.category === 'math' && '🔢'}
+                  {game.category === 'science' && '🔬'}
+                  {game.category === 'language' && '📚'}
+                  {game.category === 'coding' && '💻'}
+                  {game.category === 'physics' && '⚛️'}
+                  {game.category === 'chemistry' && '🧪'}
+                  {game.category === 'creative' && '🎨'}
+                  {game.category === 'social' && '👥'}
+                  {game.category === 'memory' && '🧠'}
+                  {game.category === 'logic' && '🧩'}
+                </div>
+
+                <div className="absolute top-4 right-4 px-4 py-2 rounded-full bg-white bg-opacity-90 text-gray-800 font-semibold capitalize">
                   {game.category}
                 </div>
               </div>
@@ -116,17 +129,17 @@ const GameDetailPage = () => {
               <div className="flex items-center gap-6 mb-6">
                 <div className="flex items-center gap-2">
                   <span className="text-yellow-500">⭐</span>
-                  <span className="font-semibold">{game.averageRating.toFixed(1)}</span>
-                  <span className="text-gray-500 text-sm">({game.totalRatings} ratings)</span>
+                  <span className="font-semibold">{(game.averageRating ?? 0).toFixed(1)}</span>
+                  <span className="text-gray-500 text-sm">({game.totalRatings ?? 0} ratings)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span>👥</span>
-                  <span className="font-semibold">{game.playCount}</span>
+                  <span className="font-semibold">{game.playCount ?? 0}</span>
                   <span className="text-gray-500 text-sm">plays</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span>⏱️</span>
-                  <span className="font-semibold">{game.duration} min</span>
+                  <span className="font-semibold">{game.duration ?? 0} min</span>
                 </div>
               </div>
 
@@ -173,7 +186,7 @@ const GameDetailPage = () => {
               <div className="mb-4">
                 <p className="text-sm font-semibold text-gray-700 mb-2">Recommended Ages</p>
                 <div className="flex flex-wrap gap-2">
-                  {game.ageGroups.map((age, index) => (
+                  {game.ageGroups?.map((age, index) => (
                     <span key={index} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
                       {age} years
                     </span>
@@ -224,7 +237,7 @@ const GameDetailPage = () => {
               <div className="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                 <p className="text-sm font-semibold text-gray-700 mb-1">Earn Points!</p>
                 <p className="text-sm text-gray-600">
-                  Complete this game to earn <span className="font-bold text-yellow-600">{game.pointsPerCompletion}</span> points
+                  Complete this game to earn <span className="font-bold text-yellow-600">{game.pointsPerCompletion ?? 0}</span> points
                 </p>
               </div>
             </Card>
