@@ -1,10 +1,9 @@
 // src/controllers/childController.js
-
 const Child = require('../models/Child');
 const User = require('../models/User');
 const Progress = require('../models/Progress');
 const Session = require('../models/Session');
-
+const Achievement = require('../models/Achievement');
 // @desc    Create a new child account
 // @route   POST /api/children
 // @access  Private (Parent/Teacher)

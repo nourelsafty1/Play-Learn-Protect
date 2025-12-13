@@ -1,51 +1,67 @@
-// src/App.js
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { Toaster } from 'react-hot-toast';
+
+// Components (We will create these next)
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ParentDashboard from './pages/ParentDashboard';
+import ChildSelect from './pages/ChildSelect';
+import ChildDashboard from './pages/ChildDashboard';
+import GamePlayer from './pages/GamePlayer';
 import Loading from './components/common/Loading';
 
-// We'll create these pages next
-// import LoginPage from './pages/LoginPage';
-// import RegisterPage from './pages/RegisterPage';
-// import ParentDashboard from './pages/ParentDashboard';
-// import ChildDashboard from './pages/ChildDashboard';
+// Protected Route Wrapper
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <Loading fullScreen />;
+  if (!user) return <Navigate to="/login" />;
+  return children;
+};
 
 function App() {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <Loading fullScreen />;
-  }
-
   return (
-    <Router>
-      <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500">
-        <Routes>
-          {/* Temporary landing page */}
-          <Route path="/" element={
-            <div className="min-h-screen flex items-center justify-center">
-              <div className="bg-white rounded-3xl shadow-2xl p-12 max-w-2xl text-center">
-                <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-4">
-                  Play, Learn & Protect
-                </h1>
-                <p className="text-gray-600 text-lg mb-8">
-                  A safe learning platform for children
-                </p>
-                <div className="text-green-600 font-semibold text-xl">
-                  ✅ Backend Connected Successfully!
-                </div>
-                <div className="text-blue-600 mt-4">
-                  Frontend is ready. Building pages next...
-                </div>
-              </div>
-            </div>
-          } />
-          
-          {/* We'll add more routes here */}
-        </Routes>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Toaster position="top-center" />
+        <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            
+            {/* Parent Routes */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <ParentDashboard />
+              </ProtectedRoute>
+            } />
+
+            {/* Child Selection (Netflix Style) */}
+            <Route path="/select-child" element={
+              <ProtectedRoute>
+                <ChildSelect />
+              </ProtectedRoute>
+            } />
+
+            {/* Child Zone */}
+            <Route path="/play/:childId" element={
+              <ProtectedRoute>
+                <ChildDashboard />
+              </ProtectedRoute>
+            } />
+            
+             <Route path="/game/:gameId" element={
+              <ProtectedRoute>
+                <GamePlayer />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/" element={<Navigate to="/login" />} />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 
