@@ -68,11 +68,15 @@ const ParentDashboard = () => {
         {/* Quick Stats */}
         {dashboardData && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-              <div className="text-3xl mb-2">👨‍👩‍👧‍👦</div>
-              <div className="text-3xl font-bold">{dashboardData.summary.totalChildren}</div>
-              <div className="text-sm opacity-90">Total Children</div>
-            </Card>
+           <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+  <div className="text-3xl mb-2">
+    {user?.role === 'teacher' ? '👨‍🎓' : '👨‍👩‍👧‍👦'}
+  </div>
+  <div className="text-3xl font-bold">{dashboardData.summary.totalChildren}</div>
+  <div className="text-sm opacity-90">
+    {user?.role === 'teacher' ? 'Total Students' : 'Total Children'}
+  </div>
+</Card>
 
             <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
               <div className="text-3xl mb-2">⏰</div>
@@ -95,20 +99,26 @@ const ParentDashboard = () => {
         )}
 
         {/* Children List */}
-        <Card title="Your Children" className="mb-8">
+        <Card title={user?.role === 'teacher' ? 'Your Students' : 'Your Children'} className="mb-8">
           {children.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">👶</div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                No children added yet
-              </h3>
-              <p className="text-gray-500 mb-6">
-                Add your first child to get started with the platform
-              </p>
-              <Button onClick={() => navigate('/children/add')}>
-                <span>➕</span>
-                <span>Add Child</span>
-              </Button>
+<div className="text-center py-12">
+  <div className="text-6xl mb-4">{user?.role === 'teacher' ? '👨‍🎓' : '👶'}</div>
+  <h3 className="text-xl font-semibold text-gray-700 mb-2">
+    {user?.role === 'teacher' ? 'No students enrolled yet' : 'No children added yet'}
+  </h3>
+  <p className="text-gray-500 mb-6">
+    {user?.role === 'teacher' 
+      ? 'Students will appear here once they are enrolled in your classes'
+      : 'Add your first child to get started with the platform'
+    }
+  </p>
+  {/* Only show Add button for parents */}
+  {user?.role !== 'teacher' && (
+    <Button onClick={() => navigate('/children/add')}>
+      <span>➕</span>
+      <span>Add Child</span>
+    </Button>
+  )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -6,7 +6,7 @@ import Navbar from '../components/common/Navbar';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import Loading from '../components/common/Loading';
-import { learningAPI, childrenAPI } from '../services/api';
+import { learningAPI, childrenAPI, progressAPI } from '../services/api';
 import { getCategoryColor } from '../utils/helpers';
 
 const LearningDetailPage = () => {
@@ -17,11 +17,20 @@ const LearningDetailPage = () => {
   const [children, setChildren] = useState([]);
   const [selectedChild, setSelectedChild] = useState('');
   const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(null);
+  const [completingLesson, setCompletingLesson] = useState(null);
 
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moduleId]);
+
+  useEffect(() => {
+    if (selectedChild && moduleId) {
+      fetchProgress();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedChild, moduleId]);
 
   const fetchData = async () => {
     try {
@@ -44,6 +53,21 @@ const LearningDetailPage = () => {
     }
   };
 
+  const fetchProgress = async () => {
+    if (!selectedChild) return;
+    
+    try {
+      const response = await progressAPI.getChildProgress(selectedChild);
+      const moduleProgress = response.data.data.find(
+        p => p.learningModule?._id === moduleId
+      );
+      setProgress(moduleProgress);
+    } catch (error) {
+      console.error('Error fetching progress:', error);
+      setProgress(null);
+    }
+  };
+
   const handleEnroll = async () => {
     if (!selectedChild) {
       alert('Please select a child');
@@ -60,6 +84,9 @@ const LearningDetailPage = () => {
       } else {
         alert('Successfully enrolled! Lessons coming soon.');
       }
+      
+      // Refresh progress after enrollment
+      await fetchProgress();
     } catch (error) {
       console.error('Error enrolling:', error);
       
@@ -69,6 +96,50 @@ const LearningDetailPage = () => {
         window.open(firstLesson.content, '_blank', 'noopener,noreferrer');
       }
     }
+  };
+
+  const handleLessonClick = (lesson) => {
+    if (!selectedChild) {
+      alert('Please select a child first');
+      return;
+    }
+    
+    // Open the lesson content
+    window.open(lesson.content, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleMarkComplete = async (lessonNumber) => {
+    if (!selectedChild) {
+      alert('Please select a child');
+      return;
+    }
+
+    try {
+      setCompletingLesson(lessonNumber);
+      
+      // Call API to mark lesson as complete
+      await progressAPI.completeLesson(moduleId, selectedChild, lessonNumber);
+      
+      // Refresh progress
+      await fetchProgress();
+      
+      // Show success message
+      alert(`✅ Lesson ${lessonNumber} marked as complete!`);
+    } catch (error) {
+      console.error('Error marking lesson complete:', error);
+      alert('Failed to mark lesson as complete. Please try again.');
+    } finally {
+      setCompletingLesson(null);
+    }
+  };
+
+  const isLessonCompleted = (lessonNumber) => {
+    if (!progress || !progress.lessonsCompleted) return false;
+    return progress.lessonsCompleted.some(l => l.lessonNumber === lessonNumber);
+  };
+
+  const getCompletedLessonsCount = () => {
+    return progress?.lessonsCompleted?.length || 0;
   };
 
   if (loading) {
@@ -92,6 +163,10 @@ const LearningDetailPage = () => {
       </>
     );
   }
+
+  const completedCount = getCompletedLessonsCount();
+  const totalLessons = module.lessons?.length || 0;
+  const completionPercentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-100 via-blue-100 to-purple-100">
@@ -135,6 +210,26 @@ const LearningDetailPage = () => {
 
               <h1 className="text-3xl font-bold text-gray-800 mb-4">{module.title}</h1>
               
+              {/* Progress Bar */}
+              {progress && (
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-gray-700">
+                      Progress: {completedCount} / {totalLessons} lessons
+                    </span>
+                    <span className="text-sm font-semibold text-purple-600">
+                      {completionPercentage}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div
+                      className="bg-gradient-to-r from-purple-500 to-blue-500 h-3 rounded-full transition-all duration-500"
+                      style={{ width: `${completionPercentage}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              
               {/* Meta Info */}
               <div className="flex items-center gap-6 mb-6">
                 <div className="flex items-center gap-2">
@@ -176,27 +271,73 @@ const LearningDetailPage = () => {
               <div className="mb-6">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">Course Content</h3>
                 <div className="space-y-3">
-                  {module.lessons?.map((lesson, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">
-                          {lesson.lessonNumber}
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-800">{lesson.title}</h4>
-                          <p className="text-sm text-gray-500">
-                            {lesson.contentType} • {lesson.duration} min
-                          </p>
+                  {module.lessons?.map((lesson, index) => {
+                    const isCompleted = isLessonCompleted(lesson.lessonNumber);
+                    const isCompleting = completingLesson === lesson.lessonNumber;
+                    
+                    return (
+                      <div 
+                        key={index} 
+                        className={`p-4 rounded-lg border-2 transition-all ${
+                          isCompleted 
+                            ? 'bg-green-50 border-green-200' 
+                            : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                              isCompleted 
+                                ? 'bg-green-500 text-white' 
+                                : 'bg-purple-500 text-white'
+                            }`}>
+                              {isCompleted ? '✓' : lesson.lessonNumber}
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-800">{lesson.title}</h4>
+                              <p className="text-sm text-gray-500">
+                                {lesson.contentType} • {lesson.duration} min
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="text-gray-400 text-2xl">
+                              {lesson.contentType === 'video' && '🎥'}
+                              {lesson.contentType === 'quiz' && '📝'}
+                              {lesson.contentType === 'interactive' && '🎮'}
+                              {lesson.contentType === 'text' && '📄'}
+                            </div>
+                            
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => handleLessonClick(lesson)}
+                              className="mr-2"
+                            >
+                              {lesson.contentType === 'video' ? 'Watch' : 'Start'}
+                            </Button>
+                            
+                            {!isCompleted && (
+                              <Button
+                                size="sm"
+                                onClick={() => handleMarkComplete(lesson.lessonNumber)}
+                                disabled={isCompleting}
+                              >
+                                {isCompleting ? 'Marking...' : 'Complete'}
+                              </Button>
+                            )}
+                            
+                            {isCompleted && (
+                              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                                Completed ✓
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                      <div className="text-gray-400">
-                        {lesson.contentType === 'video' && '🎥'}
-                        {lesson.contentType === 'quiz' && '📝'}
-                        {lesson.contentType === 'interactive' && '🎮'}
-                        {lesson.contentType === 'text' && '📄'}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -269,7 +410,7 @@ const LearningDetailPage = () => {
                 disabled={!selectedChild}
               >
                 <span className="text-2xl">🎓</span>
-                <span>Enroll Now</span>
+                <span>Start Learning</span>
               </Button>
 
               {/* Certificate Info */}
@@ -287,6 +428,9 @@ const LearningDetailPage = () => {
                 <p className="text-sm font-semibold text-gray-700 mb-1">Earn Points!</p>
                 <p className="text-sm text-gray-600">
                   Complete this course to earn <span className="font-bold text-purple-600">{module.completionPoints ?? 0}</span> points
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  +{module.pointsPerLesson ?? 0} points per lesson
                 </p>
               </div>
             </Card>

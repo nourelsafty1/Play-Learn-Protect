@@ -106,6 +106,9 @@ export const learningAPI = {
 
 export const progressAPI = {
   getChildProgress: (childId) => api.get(`/progress/child/${childId}`),
+  getModuleProgress: (childId, moduleId) => api.get(`/progress/child/${childId}/module/${moduleId}`),
+  completeLesson: (moduleId, childId, lessonNumber, data = {}) => 
+    api.post(`/progress/module/${moduleId}/child/${childId}/lesson/${lessonNumber}/complete`, data),
   getLeaderboard: (type, period, ageGroup) => api.get('/progress/leaderboard', { params: { type, period, ageGroup } }),
   getChildRank: (childId, period) => api.get(`/progress/child/${childId}/rank`, { params: { period } }),
   getSubjectProgress: (childId) => api.get(`/progress/child/${childId}/subjects`),

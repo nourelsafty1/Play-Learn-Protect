@@ -4,6 +4,7 @@ const Progress = require('../models/Progress');
 const Child = require('../models/Child');
 const Session = require('../models/Session');
 const Leaderboard = require('../models/Leaderboard');
+const LearningModule = require('../models/LearningModule');
 
 // @desc    Get child's progress overview
 // @route   GET /api/progress/child/:childId
@@ -62,10 +63,7 @@ exports.getChildProgress = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: {
-        stats: stats,
-        recentProgress: allProgress.slice(-10).reverse() // Last 10, newest first
-      }
+      data: allProgress // Send all progress so frontend can filter
     });
 
   } catch (error) {
@@ -151,6 +149,116 @@ exports.updateProgress = async (req, res, next) => {
     });
 
   } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Complete a lesson
+// @route   POST /api/progress/module/:moduleId/child/:childId/lesson/:lessonNumber/complete
+// @access  Private
+exports.completeLesson = async (req, res, next) => {
+  try {
+    const { moduleId, childId, lessonNumber } = req.params;
+    const { timeSpent } = req.body;
+
+    // Find or create progress record
+    let progress = await Progress.findOne({
+      child: childId,
+      learningModule: moduleId,
+      contentType: 'learning-module'
+    });
+
+    if (!progress) {
+      // Create new progress record
+      progress = await Progress.create({
+        child: childId,
+        learningModule: moduleId,
+        contentType: 'learning-module',
+        status: 'in-progress'
+      });
+    }
+
+    // Check if lesson already completed
+    const alreadyCompleted = progress.lessonsCompleted.some(
+      l => l.lessonNumber === parseInt(lessonNumber)
+    );
+
+    if (!alreadyCompleted) {
+      // Add to completed lessons
+      progress.lessonsCompleted.push({
+        lessonNumber: parseInt(lessonNumber),
+        completedAt: new Date(),
+        score: 100 // Default score for video lessons
+      });
+
+      // Update current lesson to next lesson
+      progress.currentLesson = parseInt(lessonNumber) + 1;
+
+      // Add time spent
+      if (timeSpent) {
+        progress.timeSpent += parseInt(timeSpent);
+      }
+
+      // Get module to calculate points
+      const module = await LearningModule.findById(moduleId);
+      if (module) {
+        progress.pointsEarned += module.pointsPerLesson || 50;
+        
+        // Calculate completion percentage
+        const totalLessons = module.lessons?.length || 0;
+        const completedCount = progress.lessonsCompleted.length;
+        progress.completionPercentage = Math.round((completedCount / totalLessons) * 100);
+
+        // Check if all lessons completed
+        if (completedCount >= totalLessons) {
+          progress.status = 'completed';
+          progress.completedAt = new Date();
+          progress.pointsEarned += module.completionPoints || 0;
+        }
+
+        // Update child's points
+        const child = await Child.findById(childId);
+        if (child) {
+          child.points += module.pointsPerLesson || 50;
+          child.totalPoints += module.pointsPerLesson || 50;
+          await child.save();
+        }
+      }
+
+      progress.lastAccessedAt = new Date();
+      await progress.save();
+    }
+
+    res.status(200).json({
+      success: true,
+      data: progress,
+      message: 'Lesson completed successfully'
+    });
+  } catch (error) {
+    console.error('Error completing lesson:', error);
+    next(error);
+  }
+};
+
+// @desc    Get progress for a specific module
+// @route   GET /api/progress/child/:childId/module/:moduleId
+// @access  Private
+exports.getModuleProgress = async (req, res, next) => {
+  try {
+    const { childId, moduleId } = req.params;
+
+    const progress = await Progress.findOne({
+      child: childId,
+      learningModule: moduleId,
+      contentType: 'learning-module'
+    }).populate('learningModule');
+
+    res.status(200).json({
+      success: true,
+      data: progress
+    });
+  } catch (error) {
+    console.error('Error fetching module progress:', error);
     next(error);
   }
 };

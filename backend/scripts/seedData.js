@@ -17,7 +17,6 @@ const connectDB = async () => {
 };
 
 // Sample Games
-// Sample Games with REAL game URLs
 const sampleGames = [
   {
     title: 'Math Adventure',
@@ -158,8 +157,9 @@ const sampleGames = [
   }
 ];
 
-// Sample Learning Modules
+// Sample Learning Modules 
 const sampleModules = [
+  // Math Module
   {
     title: 'Introduction to Numbers',
     titleArabic: 'مقدمة للأرقام',
@@ -185,7 +185,7 @@ const sampleModules = [
         title: 'Number Recognition',
         titleArabic: 'التعرف على الأرقام',
         contentType: 'interactive',
-        content: 'https://www.abcya.com/games/number_bingo',
+        content: 'https://www.mindlygames.com/game/composing-teen-numbers-taterz-quiz',
         duration: 15,
         order: 2
       },
@@ -194,8 +194,8 @@ const sampleModules = [
         title: 'Simple Addition',
         titleArabic: 'الجمع البسيط',
         contentType: 'interactive',
-        content: 'https://www.mathplayground.com/addition_blocks.html',
-        duration: 12,
+        content: 'https://poki.com/en/g/arithmetica?msockid=05f5e4886170610b2086f2e46007603d',
+        duration: 10,
         order: 3
       }
     ],
@@ -206,13 +206,15 @@ const sampleModules = [
     ],
     skills: ['counting', 'number-recognition', 'addition'],
     pointsPerLesson: 50,
-    completionPoints: 200,
+    completionPoints: 150,
     hasQuiz: true,
-    passingScore: 70,
+    passingScore: 50,
     language: ['ar', 'en'],
     isActive: true,
     isPublished: true
   },
+
+  // English Module
   {
     title: 'English Alphabet',
     titleArabic: 'الأبجدية الإنجليزية',
@@ -226,56 +228,51 @@ const sampleModules = [
     lessons: [
       {
         lessonNumber: 1,
-        title: 'Letters A-G',
-        titleArabic: 'الحروف أ-ز',
+        title: 'Learn the English Alphabet  ',
+        titleArabic: 'تعلّم أسماء الحيوانات الأليفة بالإنجليزية ',
         contentType: 'video',
-        content: 'https://www.youtube.com/watch?v=BELlZKpi1Zs',
-        duration: 12,
+        content: 'https://youtu.be/LIGD2NwPAWE?si=_51yBiXQE1Lk77Lk',
+        duration: 5,
         order: 1
       },
       {
         lessonNumber: 2,
-        title: 'Letters H-N',
-        titleArabic: 'الحروف ح-ن',
-        contentType: 'interactive',
-        content: 'https://www.abcya.com/games/alphabet_arcade',
-        duration: 12,
+        title: 'Learn Pet Animals Names in English ',
+        titleArabic: 'تعلّم أسماء الحيوانات الأليفة بالإنجليزية ',
+        contentType: 'video',
+        content: 'https://youtu.be/2NOn0Rr0SX0?si=MuW5GU6qMR280ICi',
+        duration: 4,
         order: 2
       },
       {
         lessonNumber: 3,
-        title: 'Letters O-Z',
-        titleArabic: 'الحروف و-ي',
-        contentType: 'interactive',
-        content: 'https://www.starfall.com/h/abcs/',
-        duration: 12,
+        title: 'Learn Colors in English',
+        titleArabic: 'تعلّم أسماء الألوان بالإنجليزية ',
+        contentType: 'video',
+        content: 'https://youtu.be/FA_Nbh-BQ1o?si=Eop6cAJ85Bp3yxdh',
+        duration: 3,
         order: 3
-      },
-      {
-        lessonNumber: 4,
-        title: 'Practice Test',
-        titleArabic: 'اختبار الممارسة',
-        contentType: 'quiz',
-        content: 'https://www.abcya.com/games/letter_recognition',
-        duration: 15,
-        order: 4
       }
     ],
     learningObjectives: [
       'Recognize all letters',
       'Know letter sounds',
-      'Write letters correctly'
+      'Write letters correctly',
+      'Recognize animal names in English (Pet Animals)',
+      'Know color names in English (Colors)'
     ],
     skills: ['alphabet', 'phonics', 'writing'],
-    pointsPerLesson: 40,
-    completionPoints: 180,
-    hasQuiz: true,
-    passingScore: 75,
+    pointsPerLesson: 70,
+    completionPoints: 210,
+    hasQuiz: false,
+    passingScore: 140,
     language: ['ar', 'en'],
     isActive: true,
     isPublished: true,
     isFeatured: true
   },
+
+  // Coding Module
   {
     title: 'Coding Basics',
     titleArabic: 'أساسيات البرمجة',
@@ -289,51 +286,276 @@ const sampleModules = [
     lessons: [
       {
         lessonNumber: 1,
-        title: 'What is Programming?',
-        titleArabic: 'ما هي البرمجة؟',
+        title: 'Introduction to Coding',
+        titleArabic: 'مقدمة في البرمجة',
         contentType: 'video',
-        content: 'https://www.youtube.com/watch?v=cda3_5982h8',
-        duration: 20,
+        content: 'https://youtu.be/4xMNXg4aUoo?si=yeBpSym94oTWRIWf',
+        duration: 5,
         order: 1
       },
       {
         lessonNumber: 2,
-        title: 'Your First Code',
-        titleArabic: 'الكود الأول الخاص بك',
+        title: 'Exercise on giving the computer commands',
+        titleArabic: 'تمرين على إعطاء الكمبيوتر الأوامر',
         contentType: 'interactive',
-        content: 'https://studio.code.org/s/course1',
-        duration: 25,
+        content: 'https://blockly.games/maze?lang=en',
+        duration: 10,
         order: 2
       },
       {
-        lessonNumber: 3,
-        title: 'Loops and Conditions',
-        titleArabic: 'الحلقات والشروط',
-        contentType: 'interactive',
-        content: 'https://blockly.games/maze?lang=en',
-        duration: 30,
-        order: 3
-      },
-      {
-        lessonNumber: 4,
+        lessonNumber: 2,
         title: 'Final Project',
         titleArabic: 'المشروع النهائي',
         contentType: 'interactive',
         content: 'https://scratch.mit.edu/projects/editor/',
-        duration: 35,
-        order: 4
+        duration: 40,
+        order: 3
       }
     ],
     learningObjectives: [
-      'Understand programming basics',
-      'Write simple code',
-      'Use loops and conditions'
+      'Understand what is programming',
+
     ],
     skills: ['coding', 'logic', 'problem-solving'],
-    pointsPerLesson: 60,
+    pointsPerLesson: 100,
     completionPoints: 300,
     hasQuiz: true,
+    passingScore: 100,
+    language: ['ar', 'en'],
+    isActive: true,
+    isPublished: true,
+    isFeatured: true
+  },
+
+  // BIOLOGY MODULE
+  {
+    title: 'Introduction to Biology',
+    titleArabic: 'مقدمة في علم الأحياء',
+    description: 'Discover the fascinating world of living organisms, plants, and animals',
+    descriptionArabic: 'اكتشف عالم الكائنات الحية الرائع والنباتات والحيوانات',
+    subject: 'science',
+    topic: 'biology',
+    ageGroups: ['6-8', '9-12'],
+    difficulty: 'beginner',
+    thumbnail: 'biology',
+    lessons: [
+      {
+        lessonNumber: 1,
+        title: 'What is Life?',
+        titleArabic: 'ما هي الحياة؟',
+        contentType: 'video',
+        content: 'https://www.youtube.com/watch?v=QImCld9YubE',
+        duration: 15,
+        order: 1
+      },
+      {
+        lessonNumber: 2,
+        title: 'Plant Life Cycle Stages From Seed To Fruit ',
+        titleArabic: 'مراحل دورة حياة النبات من البذرة إلى الثمرة',
+        contentType: 'video',
+        content: 'https://youtu.be/QImCld9YubE?si=5PeKraUQVVaJ6vli',
+        duration: 5,
+        order: 2
+      },
+      {
+        lessonNumber: 3,
+        title: 'Vertebrates',
+        titleArabic: 'فقاريات ',
+        contentType: 'video',
+        content: 'https://youtu.be/R50Xc1EUHwg?si=rJcwPvUI9rZyO67L',
+        duration: 4,
+        order: 3
+      },
+      {
+        lessonNumber: 4,
+        title: 'Human Body Systems',
+        titleArabic: 'أجهزة جسم الإنسان',
+        contentType: 'video',
+        content: 'https://youtu.be/9eu1bbOy5xw?si=EDN2MvxOEk5fI83T',
+        duration: 4,
+        order: 4
+      },
+    ],
+    learningObjectives: [
+      'Understand what makes something alive',
+      'Learn about plant and animal life cycles',
+      'Explore the human body',
+      'Classify different types of organisms'
+    ],
+    skills: ['observation', 'classification', 'scientific-thinking'],
+    pointsPerLesson: 55,
+    completionPoints: 220,
+    hasQuiz: false,
+    passingScore: 110,
+    language: ['ar', 'en'],
+    isActive: true,
+    isPublished: true,
+    isFeatured: true
+  },
+
+  // CHEMISTRY MODULE
+  {
+    title: 'Introduction to Chemistry',
+    titleArabic: 'مقدمة في الكيمياء',
+    description: 'Explore the building blocks of matter and fascinating chemical reactions',
+    descriptionArabic: 'استكشف وحدات بناء المادة والتفاعلات الكيميائية الرائعة',
+    subject: 'chemistry',
+    topic: 'basics',
+    ageGroups: ['9-12'],
+    difficulty: 'intermediate',
+    thumbnail: 'chemistry',
+    lessons: [
+      {
+        lessonNumber: 1,
+        title: 'What is Chemistry?',
+        titleArabic: 'ما هي الكيمياء؟',
+        contentType: 'video',
+        content: 'https://youtu.be/t8x3wdXZGEY?si=64iG4Hq5_htCaSdy',
+        duration: 2,
+        order: 1
+      },
+      {
+        lessonNumber: 2,
+        title: 'Atoms and Molecules',
+        titleArabic: 'الذرات والجزيئات',
+        contentType: 'video',
+        content: 'https://youtu.be/jMW_0Ro6b5c?si=PkvZrFjLAU40vs57',
+        duration: 7,
+        order: 2
+      },
+      {
+        lessonNumber: 3,
+        title: 'Chemical Reactions',
+        titleArabic: 'التفاعلات الكيميائية',
+        contentType: 'video',
+        content: 'https://youtu.be/5iowJs6MryI?si=RKw4xS2RbXvxA8jg',
+        duration: 10,
+        order: 3
+      },
+      
+    ],
+    learningObjectives: [
+      'Learn what chemistry is about',
+      'Understand the basic structure of atoms',
+      'Learn about different chemical reactions',
+      
+    ],
+    skills: ['analytical-thinking', 'problem-solving', 'observation'],
+    pointsPerLesson: 60,
+    completionPoints: 180,
+    hasQuiz: false,
+    passingScore: 60,
+    language: ['ar', 'en'],
+    isActive: true,
+    isPublished: true,
+    isFeatured: true
+  },
+
+  // PHYSICS MODULE
+  {
+    title: 'Introduction to Physics',
+    titleArabic: 'مقدمة في الفيزياء',
+    description: 'Discover the laws that govern motion, energy, and forces in our universe',
+    descriptionArabic: 'اكتشف القوانين التي تحكم الحركة والطاقة والقوى في كوننا',
+    subject: 'physics',
+    topic: 'basics',
+    ageGroups: ['9-12'],
+    difficulty: 'intermediate',
+    thumbnail: 'physics',
+    lessons: [
+      {
+        lessonNumber: 1,
+       title: 'Newtons First Law Of Motion',
+        titleArabic: 'قانون نيوتن الأول للحركة',
+        contentType: 'video',
+        content: 'https://youtu.be/adLj6kygwds?si=P6W02UifctKVK7nL',
+        duration: 7,
+        order: 1
+      },
+      {
+        lessonNumber: 2,
+         title: 'Newtons 2nd Law Of Motion',
+        titleArabic:'قانون نيوتن الثاني للحركة',
+        contentType: 'video',
+        content: 'https://youtu.be/8o3j1wpabes?si=WX7f06WoXuJPLQcs',
+        duration: 6,
+        order: 2
+      },
+      {
+        lessonNumber: 3,
+        title: 'Newtons 3rd Law of Motion',
+        titleArabic: 'قانون نيوتن الثالث للحركة',
+        contentType: 'video',
+        content: 'https://youtu.be/wZsktFefGhI?si=zgfJBkQ1qyXueVPq',
+        duration: 6,
+        order: 3
+      },
+    ],
+    learningObjectives: [
+      'Understand Newton\'s laws of motion'
+    ],
+    skills: ['analytical-thinking', 'problem-solving', 'mathematical-reasoning'],
+    pointsPerLesson: 80,
+    completionPoints: 240,
+    hasQuiz: false,
     passingScore: 80,
+    language: ['ar', 'en'],
+    isActive: true,
+    isPublished: true,
+    isFeatured: true
+  },
+
+  // ARABIC LANGUAGE 
+  {
+    title: 'Arabic Alphabet - الحروف العربية',
+    titleArabic: 'الحروف العربية',
+    description: 'Learn the beautiful Arabic alphabet from Alif to Ya',
+    descriptionArabic: 'تعلم الأبجدية العربية الجميلة من الألف إلى الياء',
+    subject: 'language',
+    topic: 'arabic-alphabet',
+    ageGroups: ['3-5', '6-8'],
+    difficulty: 'beginner',
+    thumbnail: 'arabic-alphabet',
+    lessons: [
+      {
+        lessonNumber: 1,
+        title: 'Arabic Alphabet for Kids with Animals',
+        titleArabic: 'الأبجدية العربية للأطفال مع الحيوانات ',
+        contentType: 'video',
+        content: 'https://youtu.be/fmbVBIiO1k0?si=7hlL4WPhdc2EIAFE',
+        duration: 10,
+        order: 1
+      },{
+        lessonNumber: 2,
+        title: 'Learn Pet names in Arabic',
+        titleArabic: 'تعلّم أسماء الحيوانات الأليفة بالعربية ',
+        contentType: 'video',
+        content: 'https://youtu.be/hsy0DIqLhnc?si=TEDm6ZedXURSFWcZ',
+        duration: 4,
+        order: 2
+      },
+{
+        lessonNumber: 3,
+        title: 'Fruits names in Arabic for Kids ',
+        titleArabic: 'أسماء الفواكه باللغة العربية للأطفال',
+        contentType: 'video',
+        content: 'https://youtu.be/9YftisfXP70?si=wPbZct82rbCJ5i9Q',
+        duration: 3,
+        order: 3
+      }
+    ],
+    learningObjectives: [
+      'Recognize all Arabic letters',
+      'Know letter sounds (حروف)',
+      'Recognize animals names in Arabic (أسماء الحيوانات)',
+      'Know color names in Arabic (أسماء الألوان)',
+      'Recognize fruit names in Arabic (أسماء الفواكه)'
+    ],
+    skills: ['arabic-alphabet', 'reading', 'writing'],
+    pointsPerLesson: 70,
+    completionPoints: 210,
+    hasQuiz: false,
+    passingScore: 140,
     language: ['ar', 'en'],
     isActive: true,
     isPublished: true,

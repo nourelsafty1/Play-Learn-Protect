@@ -9,7 +9,9 @@ const {
   getLeaderboard,
   getChildRank,
   getSubjectProgress,
-  getChildAchievements
+  getChildAchievements,
+  completeLesson,
+  getModuleProgress
 } = require('../controllers/progressController');
 const { protect, checkChildOwnership } = require('../middleware/auth');
 const {
@@ -55,6 +57,24 @@ router.get(
   validate,
   checkChildOwnership,
   getChildAchievements
+);
+
+// Module progress routes
+router.get(
+  '/child/:childId/module/:moduleId',
+  validateObjectId,
+  validate,
+  checkChildOwnership,
+  getModuleProgress
+);
+
+// Complete lesson route
+router.post(
+  '/module/:moduleId/child/:childId/lesson/:lessonNumber/complete',
+  validateObjectId,
+  validate,
+  checkChildOwnership,
+  completeLesson
 );
 
 // Single progress record routes
