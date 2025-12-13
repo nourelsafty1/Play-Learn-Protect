@@ -1,5 +1,3 @@
-// src/pages/GamesPage.js
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/common/Navbar';
@@ -11,7 +9,7 @@ import { getCategoryColor, truncate } from '../utils/helpers';
 
 const GamesPage = () => {
   const navigate = useNavigate();
-  
+
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -23,13 +21,14 @@ const GamesPage = () => {
 
   useEffect(() => {
     fetchGames();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const fetchGames = async () => {
     try {
       setLoading(true);
       const response = await gamesAPI.getAll(filters);
-      setGames(response.data.data);
+      setGames(response.data?.data || []);
     } catch (error) {
       console.error('Error fetching games:', error);
     } finally {
@@ -38,16 +37,16 @@ const GamesPage = () => {
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters({
-      ...filters,
+    setFilters(prev => ({
+      ...prev,
       [key]: value
-    });
+    }));
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -135,61 +134,83 @@ const GamesPage = () => {
           <Card>
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🎮</div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">No games found</h3>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                No games found
+              </h3>
               <p className="text-gray-500">Try adjusting your filters</p>
             </div>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {games.map((game) => (
-              <Card 
-                key={game._id} 
+              <Card
+                key={game._id}
                 className="cursor-pointer hover:shadow-2xl transition-all"
                 onClick={() => navigate(`/games/${game._id}`)}
               >
                 {/* Game Thumbnail */}
-<div className={`relative mb-4 rounded-lg overflow-hidden h-48 flex items-center justify-center ${getCategoryColor(game.category)}`}>
-  <div className="text-7xl">
-    {game.category === 'math' && '🔢'}
-    {game.category === 'science' && '🔬'}
-    {game.category === 'language' && '📚'}
-    {game.category === 'coding' && '💻'}
-    {game.category === 'physics' && '⚛️'}
-    {game.category === 'chemistry' && '🧪'}
-    {game.category === 'creative' && '🎨'}
-    {game.category === 'social' && '👥'}
-    {game.category === 'memory' && '🧠'}
-    {game.category === 'logic' && '🧩'}
-  </div>
-  <div className="absolute top-2 right-2 px-3 py-1 rounded-full bg-white bg-opacity-90 text-gray-800 text-xs font-semibold capitalize">
-    {game.category}
-  </div>
-</div>
+                <div
+                  className={`relative mb-4 rounded-lg overflow-hidden h-48 flex items-center justify-center ${getCategoryColor(
+                    game.category
+                  )}`}
+                >
+                  <div className="text-7xl">
+                    {game.category === 'math' && '🔢'}
+                    {game.category === 'science' && '🔬'}
+                    {game.category === 'language' && '📚'}
+                    {game.category === 'coding' && '💻'}
+                    {game.category === 'physics' && '⚛️'}
+                    {game.category === 'chemistry' && '🧪'}
+                    {game.category === 'creative' && '🎨'}
+                    {game.category === 'social' && '👥'}
+                    {game.category === 'memory' && '🧠'}
+                    {game.category === 'logic' && '🧩'}
+                  </div>
+
+                  <div className="absolute top-2 right-2 px-3 py-1 rounded-full bg-white bg-opacity-90 text-gray-800 text-xs font-semibold capitalize">
+                    {game.category}
+                  </div>
+                </div>
 
                 {/* Game Info */}
-                <h3 className="text-xl font-bold text-gray-800 mb-2">{game.title}</h3>
-                <p className="text-sm text-gray-600 mb-4">{truncate(game.description, 100)}</p>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  {game.title}
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  {truncate(game.description, 100)}
+                </p>
 
                 {/* Meta Info */}
-<div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-  <span>⭐ {game.averageRating.toFixed(1)}</span>
-  <span>👥 {game.playCount} plays</span>
-</div>
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                  <span>⭐ {(game.averageRating ?? 0).toFixed(1)}</span>
+                  <span>👥 {game.playCount ?? 0} plays</span>
+                </div>
 
-<div className="flex items-center justify-between text-sm mb-4">
-  <div className="flex gap-2">
-    {game.ageGroups.map((age, idx) => (
-      <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
-        {age} years
-      </span>
-    ))}
-  </div>
-  <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold capitalize">
-    {game.difficulty}
-  </span>
-</div>
+                <div className="flex items-center justify-between text-sm mb-4">
+                  <div className="flex gap-2">
+                    {game.ageGroups?.map((age, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold"
+                      >
+                        {age} years
+                      </span>
+                    ))}
+                  </div>
 
-                <Button size="sm" fullWidth>
+                  <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold capitalize">
+                    {game.difficulty}
+                  </span>
+                </div>
+
+                <Button
+                  size="sm"
+                  fullWidth
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/games/${game._id}`);
+                  }}
+                >
                   Play Now →
                 </Button>
               </Card>
