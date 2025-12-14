@@ -184,14 +184,13 @@ const LearningDetailPage = () => {
                 )}`}
               >
                 <div className="text-8xl">
-                  {module.subject === 'math' && '🔢'}
-                  {module.subject === 'science' && '🔬'}
-                  {module.subject === 'language' && '📚'}
-                  {module.subject === 'coding' && '💻'}
-                  {module.subject === 'physics' && '⚛️'}
-                  {module.subject === 'chemistry' && '🧪'}
-                  {module.subject === 'creative' && '🎨'}
-                  {module.subject === 'logic' && '🧩'}
+                    {module.subject === 'Maths' && '🔢'}
+                    {module.subject === 'Biology' && '🔬'}
+                    {module.subject === 'Arabic' && '📚'}
+                    {module.subject === 'English' && '📚'}
+                    {module.subject === 'Coding' && '💻'}
+                    {module.subject === 'Physics' && '⚛️'}
+                    {module.subject === 'Chemistry' && '🧪'}
                 </div>
 
                 <div className="absolute top-4 right-4 px-4 py-2 rounded-full bg-white bg-opacity-90 text-gray-800 font-semibold capitalize">

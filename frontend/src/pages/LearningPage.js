@@ -19,8 +19,7 @@ const LearningPage = () => {
   const [filters, setFilters] = useState({
     subject: '',
     ageGroup: '',
-    difficulty: '',
-    search: ''
+    difficulty: ''
   });
 
   useEffect(() => {
@@ -75,19 +74,6 @@ const LearningPage = () => {
         {/* Filters */}
         <Card className="mb-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Search */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Search
-              </label>
-              <input
-                type="text"
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                placeholder="Search modules..."
-                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
-              />
-            </div>
 
             {/* Subject */}
             <div>
@@ -100,14 +86,13 @@ const LearningPage = () => {
                 className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
               >
                 <option value="">All Subjects</option>
-                <option value="math">Math</option>
-                <option value="science">Science</option>
-                <option value="language">Language</option>
-                <option value="coding">Coding</option>
-                <option value="physics">Physics</option>
-                <option value="chemistry">Chemistry</option>
-                <option value="creative">Creative</option>
-                <option value="logic">Logic</option>
+                <option value="Maths">Maths</option>
+                <option value="Biology">Biology</option>
+                <option value="English">English</option>
+                <option value="Arabic">Arabic</option>
+                <option value="Coding">Coding</option>
+                <option value="Physics">Physics</option>
+                <option value="Chemistry">Chemistry</option>
               </select>
             </div>
 
@@ -173,14 +158,13 @@ const LearningPage = () => {
                   )}`}
                 >
                   <div className="text-7xl">
-                    {module.subject === 'math' && '🔢'}
-                    {module.subject === 'science' && '🔬'}
-                    {module.subject === 'language' && '📚'}
-                    {module.subject === 'coding' && '💻'}
-                    {module.subject === 'physics' && '⚛️'}
-                    {module.subject === 'chemistry' && '🧪'}
-                    {module.subject === 'creative' && '🎨'}
-                    {module.subject === 'logic' && '🧩'}
+                    {module.subject === 'Maths' && '🔢'}
+                    {module.subject === 'Biology' && '🔬'}
+                    {module.subject === 'Arabic' && '📚'}
+                    {module.subject === 'English' && '📚'}
+                    {module.subject === 'Coding' && '💻'}
+                    {module.subject === 'Physics' && '⚛️'}
+                    {module.subject === 'Chemistry' && '🧪'}
                   </div>
 
                   <div className="absolute top-2 right-2 px-3 py-1 rounded-full bg-white bg-opacity-90 text-gray-800 text-xs font-semibold capitalize">

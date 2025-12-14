@@ -106,16 +106,14 @@ const GameDetailPage = () => {
                 )}`}
               >
                 <div className="text-8xl">
-                  {game.category === 'math' && '🔢'}
-                  {game.category === 'science' && '🔬'}
-                  {game.category === 'language' && '📚'}
-                  {game.category === 'coding' && '💻'}
-                  {game.category === 'physics' && '⚛️'}
-                  {game.category === 'chemistry' && '🧪'}
-                  {game.category === 'creative' && '🎨'}
-                  {game.category === 'social' && '👥'}
-                  {game.category === 'memory' && '🧠'}
-                  {game.category === 'logic' && '🧩'}
+                   {game.category === 'Maths' && '🔢'}
+                    {game.category === 'Biology' && '🔬'}
+                    {game.category === 'Arabic' && '📚'}
+                    {game.category === 'English' && '📚'}
+                    {game.category === 'Coding' && '💻'}
+                    {game.category === 'Physics' && '⚛️'}
+                    {game.category === 'Chemistry' && '🧪'}
+                    {game.category === 'Creativity' && '🎨'}
                 </div>
 
                 <div className="absolute top-4 right-4 px-4 py-2 rounded-full bg-white bg-opacity-90 text-gray-800 font-semibold capitalize">
