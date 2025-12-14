@@ -28,7 +28,7 @@ const learningModuleSchema = new mongoose.Schema({
   subject: {
     type: String,
     required: true,
-    enum: ['math', 'science', 'language', 'coding', 'physics', 'chemistry', 'social-studies', 'arts']
+    enum: ['Maths','English', 'Biology', 'Arabic', 'Coding', 'Physics', 'Chemistry']
   },
   
   topic: {

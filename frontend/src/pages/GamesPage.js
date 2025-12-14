@@ -15,9 +15,8 @@ const GamesPage = () => {
   const [filters, setFilters] = useState({
     category: '',
     ageGroup: '',
-    difficulty: '',
-    search: ''
-  });
+    difficulty: ''
+    });
 
   useEffect(() => {
     fetchGames();
@@ -57,20 +56,6 @@ const GamesPage = () => {
         {/* Filters */}
         <Card className="mb-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Search */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Search
-              </label>
-              <input
-                type="text"
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                placeholder="Search games..."
-                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
-              />
-            </div>
-
             {/* Category */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -81,13 +66,15 @@ const GamesPage = () => {
                 onChange={(e) => handleFilterChange('category', e.target.value)}
                 className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
               >
-                <option value="">All Categories</option>
-                <option value="math">Math</option>
-                <option value="science">Science</option>
-                <option value="language">Language</option>
-                <option value="coding">Coding</option>
-                <option value="creative">Creative</option>
-                <option value="logic">Logic</option>
+                 <option value="">All Categories</option>
+  <option value="Maths">Maths</option>
+  <option value="English">English</option>
+  <option value="Biology">Biology</option>
+  <option value="Arabic">Arabic</option>
+  <option value="Coding">Coding</option>
+  <option value="Physics">Physics</option>
+  <option value="Chemistry">Chemistry</option>
+  <option value="Creativity">Creativity</option>
               </select>
             </div>
 
@@ -155,16 +142,14 @@ const GamesPage = () => {
                   )}`}
                 >
                   <div className="text-7xl">
-                    {game.category === 'math' && '🔢'}
-                    {game.category === 'science' && '🔬'}
-                    {game.category === 'language' && '📚'}
-                    {game.category === 'coding' && '💻'}
-                    {game.category === 'physics' && '⚛️'}
-                    {game.category === 'chemistry' && '🧪'}
-                    {game.category === 'creative' && '🎨'}
-                    {game.category === 'social' && '👥'}
-                    {game.category === 'memory' && '🧠'}
-                    {game.category === 'logic' && '🧩'}
+                    {game.category === 'Maths' && '🔢'}
+                    {game.category === 'Biology' && '🔬'}
+                    {game.category === 'Arabic' && '📚'}
+                    {game.category === 'English' && '📚'}
+                    {game.category === 'Coding' && '💻'}
+                    {game.category === 'Physics' && '⚛️'}
+                    {game.category === 'Chemistry' && '🧪'}
+                    {game.category === 'Creativity' && '🎨'}
                   </div>
 
                   <div className="absolute top-2 right-2 px-3 py-1 rounded-full bg-white bg-opacity-90 text-gray-800 text-xs font-semibold capitalize">

@@ -29,27 +29,27 @@ const Navbar = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link 
-              to="/dashboard" 
+            <Link
+              to="/dashboard"
               className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
             >
               Dashboard
             </Link>
-            <Link 
-              to="/games" 
+            <Link
+              to="/games"
               className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
             >
               Games
             </Link>
-            <Link 
-              to="/learning" 
+            <Link
+              to="/learning"
               className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
             >
               Learning
             </Link>
-            {user?.role === 'parent' && (
-              <Link 
-                to="/monitoring" 
+            {(user?.role === 'parent' || user?.role === 'teacher') && (
+              <Link
+                to="/monitoring"
                 className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
               >
                 Monitoring

@@ -50,19 +50,16 @@ export const getAgeGroup = (dateOfBirth) => {
 // Get color for different categories
 export const getCategoryColor = (category) => {
   const colors = {
-    math: 'bg-blue-500',
-    science: 'bg-green-500',
-    language: 'bg-purple-500',
-    coding: 'bg-yellow-500',
-    physics: 'bg-red-500',
-    chemistry: 'bg-pink-500',
-    creative: 'bg-orange-500',
-    social: 'bg-indigo-500',
-    memory: 'bg-teal-500',
-    logic: 'bg-cyan-500'
+    Maths: 'bg-gradient-to-br from-blue-400 to-blue-600',
+    English: 'bg-gradient-to-br from-purple-400 to-purple-600',
+    Biology: 'bg-gradient-to-br from-green-400 to-green-600',
+    Arabic: 'bg-gradient-to-br from-indigo-400 to-purple-500',
+    Coding: 'bg-gradient-to-br from-yellow-400 to-orange-500',
+    Physics: 'bg-gradient-to-br from-red-400 to-pink-500',
+    Chemistry: 'bg-gradient-to-br from-teal-400 to-cyan-500',
+    Creativity: 'bg-gradient-to-br from-pink-400 to-rose-500'
   };
-  
-  return colors[category] || 'bg-gray-500';
+  return colors[category] || 'bg-gradient-to-br from-gray-400 to-gray-500';
 };
 
 // Get severity color

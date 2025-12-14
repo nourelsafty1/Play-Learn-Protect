@@ -28,7 +28,7 @@ const gameSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ['math', 'science', 'language', 'coding', 'physics', 'chemistry', 'creative', 'social', 'memory', 'logic']
+    enum: ['Maths','English', 'Biology', 'Arabic', 'Coding', 'Physics', 'Chemistry', 'Creativity']
   },
   
   type: {
