@@ -74,7 +74,7 @@ const AddChildPage = () => {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card>
           <div className="text-center mb-8">
-            <div className="text-6xl mb-4">👶</div>
+            <div className="text-6xl mb-4"></div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Add Child Account</h1>
             <p className="text-gray-600">Create a new account for your child</p>
           </div>

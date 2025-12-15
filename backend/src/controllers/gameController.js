@@ -308,7 +308,6 @@ exports.startGame = async (req, res, next) => {
     }
 
     const game = await Game.findById(req.params.id);
-
     if (!game) {
       return res.status(404).json({
         success: false,
@@ -316,30 +315,25 @@ exports.startGame = async (req, res, next) => {
       });
     }
 
-    // Increment play count
+    // increment play count
     await game.incrementPlayCount();
 
-    // Create or update progress
-    let progress = await Progress.findOne({
+    // generate a new session ID for THIS play session
+    const sessionId = crypto.randomUUID();
+
+    // create a NEW progress entry per session
+    const progress = await Progress.create({
       child: childId,
-      game: game._id
+      contentType: 'game',
+      game: game._id,
+      sessionId,                 
+      status: 'in-progress',
+      attempts: 1,
+      startedAt: new Date(),
+      lastAccessedAt: new Date()
     });
 
-    if (!progress) {
-      progress = await Progress.create({
-        child: childId,
-        contentType: 'game',
-        game: game._id,
-        status: 'in-progress'
-      });
-    } else {
-      progress.status = 'in-progress';
-      progress.lastAccessedAt = Date.now();
-      progress.attempts += 1;
-      await progress.save();
-    }
-
-    // Update child's streak
+    // update child's streak
     const child = await Child.findById(childId);
     if (child) {
       child.updateStreak();
@@ -351,10 +345,13 @@ exports.startGame = async (req, res, next) => {
       message: 'Game started',
       data: {
         gameId: game._id,
-        progressId: progress._id }
-});
-} catch (error) {
-next(error);
-}
+        progressId: progress._id,
+        sessionId               
+      }
+    });
+
+  } catch (error) {
+    next(error);
+  }
 };
 module.exports = exports;
