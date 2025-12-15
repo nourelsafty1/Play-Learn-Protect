@@ -11,10 +11,10 @@ const progressSchema = new mongoose.Schema({
     index: true
   },
 
-  // Session identifier 
+  // Session identifier - Optional for learning modules
   sessionId: {
     type: String,
-    required: true,
+    // required: true, // Removed to allow learning modules (no session)
     index: true
   },
 
@@ -185,15 +185,27 @@ progressSchema.index({ child: 1, learningModule: 1 });
 /**
  * Methods
  */
-progressSchema.methods.calculateCompletion = function () {
+progressSchema.methods.calculateCompletion = function (totalItems = 10) {
   if (this.contentType === 'learning-module') {
     const completed = this.lessonsCompleted.length;
-    this.completionPercentage = Math.min(100, (completed / 10) * 100);
+    // Use passed totalItems (from module.lessons.length) or default to 10 as fallback
+    // But ideally, the controller should update this percentage, or we assume a standard count if not provided
+    // For now, let's just make it safer by not hardcoding 10 if we can avoid it, 
+    // but without access to the Module here, we rely on the controller to set completionPercentage
+    // OR we change this to just return true/false and let controller handle math.
+    // However, to permit custom totals, we can accept an argument.
+
+    if (totalItems > 0) {
+      this.completionPercentage = Math.min(100, Math.round((completed / totalItems) * 100));
+    }
   }
 
   if (this.contentType === 'game') {
     const completed = this.levelsCompleted.length;
-    this.completionPercentage = Math.min(100, (completed / 10) * 100);
+    // Assuming games might have levels, defaulting to 10 if unknown
+    if (totalItems > 0) {
+      this.completionPercentage = Math.min(100, Math.round((completed / totalItems) * 100));
+    }
   }
 
   if (this.completionPercentage >= 100) {

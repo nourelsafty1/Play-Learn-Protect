@@ -17,6 +17,8 @@ const { protect, checkChildOwnership } = require('../middleware/auth');
 const {
   validateObjectId,
   validateProgressUpdate,
+  validateChildId,
+  validateProgressParams,
   validate
 } = require('../middleware/validation');
 
@@ -29,7 +31,7 @@ router.get('/leaderboard', getLeaderboard);
 // Child-specific progress routes
 router.get(
   '/child/:childId',
-  validateObjectId,
+  validateChildId,
   validate,
   checkChildOwnership,
   getChildProgress
@@ -37,7 +39,7 @@ router.get(
 
 router.get(
   '/child/:childId/rank',
-  validateObjectId,
+  validateChildId,
   validate,
   checkChildOwnership,
   getChildRank
@@ -45,7 +47,7 @@ router.get(
 
 router.get(
   '/child/:childId/subjects',
-  validateObjectId,
+  validateChildId,
   validate,
   checkChildOwnership,
   getSubjectProgress
@@ -53,7 +55,7 @@ router.get(
 
 router.get(
   '/child/:childId/achievements',
-  validateObjectId,
+  validateChildId,
   validate,
   checkChildOwnership,
   getChildAchievements
@@ -62,7 +64,7 @@ router.get(
 // Module progress routes
 router.get(
   '/child/:childId/module/:moduleId',
-  validateObjectId,
+  validateProgressParams,
   validate,
   checkChildOwnership,
   getModuleProgress
@@ -71,7 +73,7 @@ router.get(
 // Complete lesson route
 router.post(
   '/module/:moduleId/child/:childId/lesson/:lessonNumber/complete',
-  validateObjectId,
+  validateProgressParams,
   validate,
   checkChildOwnership,
   completeLesson

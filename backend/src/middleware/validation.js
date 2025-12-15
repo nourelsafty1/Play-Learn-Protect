@@ -270,3 +270,26 @@ exports.validateRating = [
     .isLength({ max: 500 })
     .withMessage('Feedback cannot exceed 500 characters')
 ];
+
+// Validation for Child ID parameter
+exports.validateChildId = [
+  param('childId')
+    .isMongoId()
+    .withMessage('Invalid child ID format')
+];
+
+// Validation for Progress parameters involved in completion
+exports.validateProgressParams = [
+  param('moduleId')
+    .optional()
+    .isMongoId()
+    .withMessage('Invalid module ID format'),
+  param('childId')
+    .optional()
+    .isMongoId()
+    .withMessage('Invalid child ID format'),
+  param('lessonNumber')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Lesson number must be a positive integer')
+];
