@@ -19,7 +19,7 @@ const connectDB = async () => {
 // Sample Games
 const sampleGames = [
   {
-    title: 'Math Adventure',
+    title: 'Maths Adventure',
     titleArabic: 'مغامرة الرياضيات',
     description: 'Learn addition and subtraction through exciting adventures!',
     descriptionArabic: 'تعلم الجمع والطرح من خلال مغامرات مثيرة!',
@@ -56,7 +56,7 @@ const sampleGames = [
     ageGroups: ['3-5', '6-8'],
     difficulty: 'beginner',
     thumbnail: 'word-game',
-    gameUrl: 'https://www.abcya.com/games/alphabet_arcade',
+    gameUrl: '/games/english/word-builder-6-8.html',
     learningObjectives: [
       'Learn new words',
       'Improve spelling',
@@ -432,13 +432,13 @@ const sampleModules = [
         duration: 10,
         order: 3
       },
-      
+
     ],
     learningObjectives: [
       'Learn what chemistry is about',
       'Understand the basic structure of atoms',
       'Learn about different chemical reactions',
-      
+
     ],
     skills: ['analytical-thinking', 'problem-solving', 'observation'],
     pointsPerLesson: 60,
@@ -465,7 +465,7 @@ const sampleModules = [
     lessons: [
       {
         lessonNumber: 1,
-       title: 'Newtons First Law Of Motion',
+        title: 'Newtons First Law Of Motion',
         titleArabic: 'قانون نيوتن الأول للحركة',
         contentType: 'video',
         content: 'https://youtu.be/adLj6kygwds?si=P6W02UifctKVK7nL',
@@ -474,8 +474,8 @@ const sampleModules = [
       },
       {
         lessonNumber: 2,
-         title: 'Newtons 2nd Law Of Motion',
-        titleArabic:'قانون نيوتن الثاني للحركة',
+        title: 'Newtons 2nd Law Of Motion',
+        titleArabic: 'قانون نيوتن الثاني للحركة',
         contentType: 'video',
         content: 'https://youtu.be/8o3j1wpabes?si=WX7f06WoXuJPLQcs',
         duration: 6,
@@ -525,7 +525,7 @@ const sampleModules = [
         content: 'https://youtu.be/fmbVBIiO1k0?si=7hlL4WPhdc2EIAFE',
         duration: 10,
         order: 1
-      },{
+      }, {
         lessonNumber: 2,
         title: 'Learn Pet names in Arabic',
         titleArabic: 'تعلّم أسماء الحيوانات الأليفة بالعربية ',
@@ -534,7 +534,7 @@ const sampleModules = [
         duration: 4,
         order: 2
       },
-{
+      {
         lessonNumber: 3,
         title: 'Fruits names in Arabic for Kids ',
         titleArabic: 'أسماء الفواكه باللغة العربية للأطفال',

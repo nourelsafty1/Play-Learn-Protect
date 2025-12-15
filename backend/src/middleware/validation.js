@@ -23,7 +23,7 @@ exports.validateRegister = [
     .withMessage('Name is required')
     .isLength({ min: 2, max: 50 })
     .withMessage('Name must be between 2 and 50 characters'),
-  
+
   body('email')
     .trim()
     .notEmpty()
@@ -31,13 +31,13 @@ exports.validateRegister = [
     .isEmail()
     .withMessage('Please provide a valid email')
     .normalizeEmail(),
-  
+
   body('password')
     .notEmpty()
     .withMessage('Password is required')
     .isLength({ min: 6 })
     .withMessage('Password must be at least 6 characters'),
-  
+
   body('role')
     .optional()
     .isIn(['parent', 'teacher', 'admin'])
@@ -53,7 +53,7 @@ exports.validateLogin = [
     .isEmail()
     .withMessage('Please provide a valid email')
     .normalizeEmail(),
-  
+
   body('password')
     .notEmpty()
     .withMessage('Password is required')
@@ -67,7 +67,7 @@ exports.validateCreateChild = [
     .withMessage('Child name is required')
     .isLength({ min: 2, max: 50 })
     .withMessage('Name must be between 2 and 50 characters'),
-  
+
   body('username')
     .trim()
     .notEmpty()
@@ -76,7 +76,7 @@ exports.validateCreateChild = [
     .withMessage('Username must be between 3 and 20 characters')
     .matches(/^[a-zA-Z0-9_]+$/)
     .withMessage('Username can only contain letters, numbers, and underscores'),
-  
+
   body('dateOfBirth')
     .notEmpty()
     .withMessage('Date of birth is required')
@@ -89,13 +89,13 @@ exports.validateCreateChild = [
       }
       return true;
     }),
-  
+
   body('ageGroup')
     .notEmpty()
     .withMessage('Age group is required')
     .isIn(['3-5', '6-8', '9-12'])
     .withMessage('Age group must be 3-5, 6-8, or 9-12'),
-  
+
   body('gender')
     .optional()
     .isIn(['male', 'female', 'other'])
@@ -108,12 +108,12 @@ exports.validateUpdateChildSettings = [
     .optional()
     .isInt({ min: 0, max: 480 })
     .withMessage('Screen time limit must be between 0 and 480 minutes (8 hours)'),
-  
+
   body('contentFilterLevel')
     .optional()
     .isIn(['strict', 'moderate', 'minimal'])
     .withMessage('Content filter level must be strict, moderate, or minimal'),
-  
+
   body('language')
     .optional()
     .isIn(['en', 'ar'])
@@ -128,24 +128,24 @@ exports.validateCreateGame = [
     .withMessage('Game title is required')
     .isLength({ max: 100 })
     .withMessage('Title cannot exceed 100 characters'),
-  
+
   body('description')
     .trim()
     .notEmpty()
     .withMessage('Game description is required'),
-  
+
   body('category')
     .notEmpty()
     .withMessage('Category is required')
     .isIn(['math', 'science', 'language', 'coding', 'physics', 'chemistry', 'creative', 'social', 'memory', 'logic'])
     .withMessage('Invalid category'),
-  
+
   body('type')
     .notEmpty()
     .withMessage('Game type is required')
     .isIn(['serious', 'creative', 'casual'])
     .withMessage('Type must be serious, creative, or casual'),
-  
+
   body('ageGroups')
     .isArray({ min: 1 })
     .withMessage('At least one age group is required')
@@ -154,14 +154,14 @@ exports.validateCreateGame = [
       return value.every(age => validAgeGroups.includes(age));
     })
     .withMessage('Invalid age group'),
-  
+
   body('gameUrl')
     .trim()
     .notEmpty()
     .withMessage('Game URL is required')
     .isURL()
     .withMessage('Please provide a valid URL'),
-  
+
   body('thumbnail')
     .trim()
     .notEmpty()
@@ -181,7 +181,7 @@ exports.validatePagination = [
     .optional()
     .isInt({ min: 1 })
     .withMessage('Page must be a positive integer'),
-  
+
   query('limit')
     .optional()
     .isInt({ min: 1, max: 100 })
@@ -194,12 +194,12 @@ exports.validateProgressUpdate = [
     .optional()
     .isInt({ min: 0, max: 100 })
     .withMessage('Score must be between 0 and 100'),
-  
+
   body('timeSpent')
     .optional()
     .isInt({ min: 0 })
     .withMessage('Time spent must be a positive number'),
-  
+
   body('status')
     .optional()
     .isIn(['not-started', 'in-progress', 'completed'])
@@ -213,7 +213,7 @@ exports.validateSessionStart = [
     .withMessage('Child ID is required')
     .isMongoId()
     .withMessage('Invalid child ID format'),
-  
+
   body('deviceType')
     .optional()
     .isIn(['mobile', 'tablet', 'desktop'])
@@ -227,13 +227,13 @@ exports.validateContentFlag = [
     .withMessage('Child ID is required')
     .isMongoId()
     .withMessage('Invalid child ID'),
-  
+
   body('contentType')
     .notEmpty()
     .withMessage('Content type is required')
     .isIn(['game', 'learning-module', 'user-generated', 'external-link', 'chat-message'])
     .withMessage('Invalid content type'),
-  
+
   body('flagReason')
     .notEmpty()
     .withMessage('Flag reason is required')
@@ -249,7 +249,7 @@ exports.validateContentFlag = [
       'other'
     ])
     .withMessage('Invalid flag reason'),
-  
+
   body('contentDescription')
     .trim()
     .notEmpty()
@@ -263,7 +263,7 @@ exports.validateRating = [
     .withMessage('Rating is required')
     .isInt({ min: 1, max: 5 })
     .withMessage('Rating must be between 1 and 5'),
-  
+
   body('feedback')
     .optional()
     .trim()
