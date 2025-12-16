@@ -179,21 +179,6 @@ const seedDatabase = async () => {
     await Game.insertMany(sampleGames);
     console.log(`✅ Added ${sampleGames.length} games`);
 
-    console.log('\nDropping LearningModule indexes...');
-    try {
-      await LearningModule.collection.dropIndexes();
-      console.log('✅ LearningModule indexes dropped');
-    } catch (err) {
-      console.log('No LearningModule indexes to drop');
-    }
-
-    console.log('Clearing existing learning modules...');
-    await LearningModule.deleteMany({});
-
-    console.log('Adding sample learning modules...');
-    await LearningModule.insertMany(sampleModules);
-    console.log(`✅ Added ${sampleModules.length} learning modules`);
-
     console.log('\n🎉 Database seeded successfully!');
     process.exit(0);
   } catch (error) {
