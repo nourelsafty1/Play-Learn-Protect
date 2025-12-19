@@ -4,16 +4,20 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Button from '../components/common/Button';
+import { useTranslation } from '../utils/translations';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  
+  const { t, lang, changeLanguage } = useTranslation();
+
+  const isArabic = lang === 'ar';
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -32,43 +36,56 @@ const LoginPage = () => {
 
     // Validation
     if (!formData.email || !formData.password) {
-      setError('Please fill in all fields');
+      setError(t('fillRequiredFields'));
       setLoading(false);
       return;
     }
 
     try {
       const result = await login(formData.email, formData.password);
-      
+
       if (result.success) {
         // Redirect based on role
         navigate('/dashboard');
       } else {
-        setError(result.message || 'Login failed');
+        setError(result.message || t('loginFailed'));
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(t('errorOccurredPleaseTryAgain'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-400 via-pink-500 to-red-500">
+    <div key={lang} className={`min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 ${isArabic ? 'font-arabic' : ''}`} dir={isArabic ? 'rtl' : 'ltr'}>
       <div className="w-full max-w-md">
         {/* Logo/Title */}
-        <div className="text-center mb-8 animate-bounce">
-          <div className="text-6xl mb-4">🎮</div>
+        <div className="text-center mb-8">
+          <div className="text-6xl mb-4 animate-bounce">🎮</div>
           <h1 className="text-4xl font-bold text-white drop-shadow-lg">
-            Play, Learn & Protect
+            {t('playLearnProtect')}
           </h1>
-          <p className="text-white text-lg mt-2">Welcome back!</p>
+          <p className="text-white text-lg mt-2">{t('welcomeBack')}</p>
         </div>
 
         {/* Login Form Card */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 relative">
+          {/* Internal Language Switcher */}
+          <div className="flex justify-end mb-6">
+            <button
+              type="button"
+              onClick={() => changeLanguage(isArabic ? 'en' : 'ar')}
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-2 border border-gray-200 shadow-sm"
+              title={isArabic ? 'Switch to English' : 'التبديل للعربية'}
+            >
+              <span className="text-lg leading-none">{isArabic ? '🇺🇸' : '🇪🇬'}</span>
+              <span>{isArabic ? 'English' : 'العربية'}</span>
+            </button>
+          </div>
+
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-            Login to Your Account
+            {t('loginToAccount')}
           </h2>
 
           {/* Error Message */}
@@ -82,7 +99,7 @@ const LoginPage = () => {
             {/* Email Input */}
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                Email Address
+                {t('emailAddress')}
               </label>
               <input
                 type="email"
@@ -99,7 +116,7 @@ const LoginPage = () => {
             {/* Password Input */}
             <div>
               <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-                Password
+                {t('password')}
               </label>
               <input
                 type="password"
@@ -123,11 +140,11 @@ const LoginPage = () => {
               {loading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Logging in...
+                  {t('loggingIn')}
                 </>
               ) : (
                 <>
-                  <span>Login</span>
+                  <span>{t('login')}</span>
                   <span>→</span>
                 </>
               )}
@@ -137,12 +154,12 @@ const LoginPage = () => {
           {/* Register Link */}
           <div className="mt-6 text-center">
             <p className="text-gray-600">
-              Don't have an account?{' '}
-              <Link 
-                to="/register" 
+              {t('dontHaveAccount')}{' '}
+              <Link
+                to="/register"
                 className="text-purple-600 font-semibold hover:text-purple-700 transition-colors"
               >
-                Register here
+                {t('registerHere')}
               </Link>
             </p>
           </div>

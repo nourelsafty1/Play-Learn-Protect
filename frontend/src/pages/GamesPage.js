@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/common/Navbar';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
@@ -9,6 +10,7 @@ import { getCategoryColor, truncate } from '../utils/helpers';
 
 const GamesPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +18,7 @@ const GamesPage = () => {
     category: '',
     ageGroup: '',
     difficulty: ''
-    });
+  });
 
   useEffect(() => {
     fetchGames();
@@ -66,15 +68,15 @@ const GamesPage = () => {
                 onChange={(e) => handleFilterChange('category', e.target.value)}
                 className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
               >
-                 <option value="">All Categories</option>
-  <option value="Maths">Maths</option>
-  <option value="English">English</option>
-  <option value="Biology">Biology</option>
-  <option value="Arabic">Arabic</option>
-  <option value="Coding">Coding</option>
-  <option value="Physics">Physics</option>
-  <option value="Chemistry">Chemistry</option>
-  <option value="Creativity">Creativity</option>
+                <option value="">All Categories</option>
+                <option value="Maths">Maths</option>
+                <option value="English">English</option>
+                <option value="Biology">Biology</option>
+                <option value="Arabic">Arabic</option>
+                <option value="Coding">Coding</option>
+                <option value="Physics">Physics</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Creativity">Creativity</option>
               </select>
             </div>
 
@@ -159,10 +161,10 @@ const GamesPage = () => {
 
                 {/* Game Info */}
                 <h3 className="text-xl font-bold text-gray-800 mb-2">
-                  {game.title}
+                  {(user?.language === 'ar' && game.titleArabic) ? game.titleArabic : game.title}
                 </h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  {truncate(game.description, 100)}
+                  {truncate((user?.language === 'ar' && game.descriptionArabic) ? game.descriptionArabic : game.description, 100)}
                 </p>
 
                 {/* Meta Info */}

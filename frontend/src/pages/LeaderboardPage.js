@@ -6,8 +6,10 @@ import Card from '../components/common/Card';
 import Loading from '../components/common/Loading';
 import { progressAPI } from '../services/api';
 import { getInitials, getAvatarColor } from '../utils/helpers';
+import { useTranslation } from '../utils/translations';
 
 const LeaderboardPage = () => {
+  const { t } = useTranslation();
   const [leaderboard, setLeaderboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -58,8 +60,8 @@ const LeaderboardPage = () => {
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="text-6xl mb-4">🏆</div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Leaderboard</h1>
-          <p className="text-gray-600 text-lg">See who's leading the way!</p>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">{t('leaderboard')}</h1>
+          <p className="text-gray-600 text-lg">{t('seeWhoIsLeading')}</p>
         </div>
 
         {/* Filters */}
@@ -68,31 +70,31 @@ const LeaderboardPage = () => {
             {/* Type */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Leaderboard Type
+                {t('leaderboardType')}
               </label>
               <select
                 value={filters.type}
                 onChange={(e) => setFilters({ ...filters, type: e.target.value, ageGroup: e.target.value === 'children' ? '' : filters.ageGroup })}
                 className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
               >
-                <option value="children">All Children</option>
-                <option value="age-group">By Age Group</option>
+                <option value="children">{t('allChildren')}</option>
+                <option value="age-group">{t('byAgeGroup')}</option>
               </select>
             </div>
 
             {/* Period */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Time Period
+                {t('timePeriod')}
               </label>
               <select
                 value={filters.period}
                 onChange={(e) => setFilters({ ...filters, period: e.target.value })}
                 className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
               >
-                <option value="all-time">All Time</option>
-                <option value="weekly">This Week</option>
-                <option value="monthly">This Month</option>
+                <option value="all-time">{t('allTime')}</option>
+                <option value="weekly">{t('thisWeek')}</option>
+                <option value="monthly">{t('thisMonth')}</option>
               </select>
             </div>
 
@@ -100,17 +102,17 @@ const LeaderboardPage = () => {
             {filters.type === 'age-group' && (
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Age Group
+                  {t('ageGroup')}
                 </label>
                 <select
                   value={filters.ageGroup}
                   onChange={(e) => setFilters({ ...filters, ageGroup: e.target.value })}
                   className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
                 >
-                  <option value="">Select Age Group</option>
-                  <option value="3-5">3-5 years</option>
-                  <option value="6-8">6-8 years</option>
-                  <option value="9-12">9-12 years</option>
+                  <option value="">{t('selectAgeGroup')}</option>
+                  <option value="3-5">3-5 {t('years')}</option>
+                  <option value="6-8">6-8 {t('years')}</option>
+                  <option value="9-12">9-12 {t('years')}</option>
                 </select>
               </div>
             )}
@@ -160,7 +162,7 @@ const LeaderboardPage = () => {
             )}
 
             {/* Full Rankings */}
-            <Card title="Full Rankings">
+            <Card title={t('fullRankings')}>
               <div className="space-y-3">
                 {leaderboard.rankings
                   .filter(entry => entry.child) // Filter out entries with null children
@@ -186,7 +188,7 @@ const LeaderboardPage = () => {
                             {entry.child.name}
                           </h4>
                           <p className={`text-sm ${index < 3 ? 'text-white opacity-90' : 'text-gray-500'}`}>
-                            Level {entry.child.level}
+                            {t('level')} {entry.child.level}
                           </p>
                         </div>
                       </div>
@@ -196,7 +198,7 @@ const LeaderboardPage = () => {
                           {entry.score}
                         </div>
                         <div className={`text-xs ${index < 3 ? 'text-white opacity-90' : 'text-gray-500'}`}>
-                          points
+                          {t('points')}
                         </div>
                         {entry.rankChange !== 0 && (
                           <div className={`text-xs mt-1 ${entry.rankChange > 0
@@ -216,8 +218,8 @@ const LeaderboardPage = () => {
           <Card>
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🏆</div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">No rankings yet</h3>
-              <p className="text-gray-500">Start playing to appear on the leaderboard!</p>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">{t('noRankingsYet')}</h3>
+              <p className="text-gray-500">{t('startPlayingToAppear')}</p>
             </div>
           </Card>
         )}

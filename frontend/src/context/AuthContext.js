@@ -17,6 +17,14 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [language, setLanguage] = useState(localStorage.getItem('guestLang') || 'ar');
+
+  // Sync language with user profile if logged in
+  useEffect(() => {
+    if (user?.language) {
+      setLanguage(user.language);
+    }
+  }, [user]);
 
   // Check if user is logged in on mount
   useEffect(() => {
@@ -59,7 +67,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       // Better error handling
       let message = 'Login failed';
-      
+
       if (err.response) {
         // Server responded with error
         message = err.response.data?.message || `Server error: ${err.response.status}`;
@@ -70,7 +78,7 @@ export const AuthProvider = ({ children }) => {
         // Error setting up request
         message = err.message || 'An unexpected error occurred';
       }
-      
+
       console.error('Login error:', err);
       setError(message);
       return { success: false, message };
@@ -93,7 +101,7 @@ export const AuthProvider = ({ children }) => {
       // Better error handling - show specific validation errors
       let message = 'Registration failed';
       let errors = null;
-      
+
       if (err.response?.data) {
         errors = err.response.data.errors;
         // Get first error message or use general message
@@ -107,7 +115,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         message = err.message || message;
       }
-      
+
       console.error('Registration error:', err.response?.data || err);
       setError(message);
       return { success: false, message, errors };
@@ -126,16 +134,29 @@ export const AuthProvider = ({ children }) => {
   const updateUser = (userData) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
+    if (userData.language) {
+      setLanguage(userData.language);
+    }
+  };
+
+  const changeLanguage = (newLang) => {
+    setLanguage(newLang);
+    localStorage.setItem('guestLang', newLang);
+    if (user) {
+      updateUser({ ...user, language: newLang });
+    }
   };
 
   const value = {
     user,
     loading,
     error,
+    language,
     login,
     register,
     logout,
     updateUser,
+    changeLanguage,
     isAuthenticated: !!user
   };
 

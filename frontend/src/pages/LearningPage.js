@@ -177,8 +177,12 @@ const LearningPage = () => {
                 </div>
 
                 {/* Module Info */}
-                <h3 className="text-xl font-bold text-gray-800 mb-2">{module.title}</h3>
-                <p className="text-sm text-gray-600 mb-4">{truncate(module.description, 100)}</p>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  {(user?.language === 'ar' && module.titleArabic) ? module.titleArabic : module.title}
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  {truncate((user?.language === 'ar' && module.descriptionArabic) ? module.descriptionArabic : module.description, 100)}
+                </p>
 
                 {/* Meta Info */}
                 <div className="flex items-center justify-between text-sm text-gray-500 mb-4">

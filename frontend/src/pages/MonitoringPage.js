@@ -8,9 +8,11 @@ import Button from '../components/common/Button';
 import Loading from '../components/common/Loading';
 import { childrenAPI, monitoringAPI } from '../services/api';
 import { formatDuration } from '../utils/helpers';
+import { useTranslation } from '../utils/translations';
 
 const MonitoringPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { childId: urlChildId } = useParams(); // Get childId from URL if present
   
   const [children, setChildren] = useState([]);
@@ -43,7 +45,7 @@ const MonitoringPage = () => {
       const response = await childrenAPI.getAll();
       const childrenData = response.data.data;
       setChildren(childrenData);
-      
+
       if (childrenData.length > 0) {
         // Use URL childId if present, otherwise use first child
         if (urlChildId && childrenData.find(c => c._id === urlChildId)) {
@@ -103,12 +105,12 @@ const MonitoringPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">📊 Monitoring Dashboard</h1>
-          <p className="text-gray-600 text-lg">Track your children's activity and progress</p>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">📊 {t('monitoringDashboard')}</h1>
+          <p className="text-gray-600 text-lg">{t('trackActivity')}</p>
         </div>
 
         {/* Controls */}
@@ -117,7 +119,7 @@ const MonitoringPage = () => {
             {/* Child Selector */}
             <div className="flex-1 w-full md:w-auto">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Select Child
+                {t('selectChild')}
               </label>
               <select
                 value={selectedChild || ''}
@@ -135,16 +137,16 @@ const MonitoringPage = () => {
             {/* Period Selector */}
             <div className="flex-1 w-full md:w-auto">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Time Period
+                {t('timePeriod')}
               </label>
               <select
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}
                 className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
               >
-                <option value="7">Last 7 Days</option>
-                <option value="30">Last 30 Days</option>
-                <option value="90">Last 3 Months</option>
+                <option value="7">{t('last7Days')}</option>
+                <option value="30">{t('last30Days')}</option>
+                <option value="90">{t('last3Months')}</option>
               </select>
             </div>
 
@@ -155,7 +157,7 @@ const MonitoringPage = () => {
                 disabled={!selectedChild}
                 className="w-full"
               >
-                View Detailed Report →
+                {t('viewDetailedReport')} →
               </Button>
             </div>
           </div>
@@ -169,40 +171,40 @@ const MonitoringPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
               <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white text-center">
                 <div className="text-3xl mb-2">⏰</div>
-                <div className="text-4xl font-bold mb-2">{analytics.screenTime.totalTime}m</div>
-                <div className="text-sm opacity-90">Total Screen Time</div>
+                <div className="text-4xl font-bold mb-2">{analytics.screenTime.totalTime}{t('min')}</div>
+                <div className="text-sm opacity-90">{t('totalScreenTime')}</div>
               </Card>
 
               <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white text-center">
                 <div className="text-3xl mb-2">🎮</div>
                 <div className="text-4xl font-bold mb-2">{analytics.learning.totalActivities}</div>
-                <div className="text-sm opacity-90">Activities Completed</div>
+                <div className="text-sm opacity-90">{t('activitiesCompleted')}</div>
               </Card>
 
               <Card className="bg-gradient-to-br from-yellow-500 to-orange-500 text-white text-center">
                 <div className="text-3xl mb-2">📚</div>
                 <div className="text-4xl font-bold mb-2">{analytics.learning.modules.completed}</div>
-                <div className="text-sm opacity-90">Modules Completed</div>
+                <div className="text-sm opacity-90">{t('modulesCompleted')}</div>
               </Card>
 
               <Card className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-center">
                 <div className="text-3xl mb-2">🛡️</div>
                 <div className="text-4xl font-bold mb-2">{analytics.safety.safetyScore}</div>
-                <div className="text-sm opacity-90">Safety Score</div>
+                <div className="text-sm opacity-90">{t('safetyScore')}</div>
               </Card>
             </div>
 
             {/* Screen Time Breakdown */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-              <Card title="⏰ Screen Time Breakdown">
+              <Card title={`⏰ ${t('screenTimeBreakdown')}`}>
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between mb-2">
-                      <span className="text-gray-600">Games</span>
-                      <span className="font-semibold">{Math.round(analytics.screenTime.activityBreakdown.games)}m</span>
+                      <span className="text-gray-600">{t('games')}</span>
+                      <span className="font-semibold">{Math.round(analytics.screenTime.activityBreakdown.games)}{t('min')}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
+                      <div
                         className="bg-blue-500 h-2 rounded-full"
                         style={{ width: `${(analytics.screenTime.activityBreakdown.games / analytics.screenTime.totalTime) * 100}%` }}
                       ></div>
@@ -211,11 +213,11 @@ const MonitoringPage = () => {
 
                   <div>
                     <div className="flex justify-between mb-2">
-                      <span className="text-gray-600">Learning</span>
-                      <span className="font-semibold">{Math.round(analytics.screenTime.activityBreakdown.learning)}m</span>
+                      <span className="text-gray-600">{t('learning')}</span>
+                      <span className="font-semibold">{Math.round(analytics.screenTime.activityBreakdown.learning)}{t('min')}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
+                      <div
                         className="bg-green-500 h-2 rounded-full"
                         style={{ width: `${(analytics.screenTime.activityBreakdown.learning / analytics.screenTime.totalTime) * 100}%` }}
                       ></div>
@@ -224,11 +226,11 @@ const MonitoringPage = () => {
 
                   <div>
                     <div className="flex justify-between mb-2">
-                      <span className="text-gray-600">Creative</span>
-                      <span className="font-semibold">{Math.round(analytics.screenTime.activityBreakdown.creative)}m</span>
+                      <span className="text-gray-600">{t('creative')}</span>
+                      <span className="font-semibold">{Math.round(analytics.screenTime.activityBreakdown.creative)}{t('min')}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
+                      <div
                         className="bg-purple-500 h-2 rounded-full"
                         style={{ width: `${(analytics.screenTime.activityBreakdown.creative / analytics.screenTime.totalTime) * 100}%` }}
                       ></div>
@@ -238,22 +240,22 @@ const MonitoringPage = () => {
               </Card>
 
               {/* Learning Progress */}
-              <Card title="📊 Learning Progress">
+              <Card title={`📊 ${t('learningProgress')}`}>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Games Completed</span>
+                    <span className="text-gray-600">{t('gamesCompleted')}</span>
                     <span className="text-2xl font-bold text-blue-600">{analytics.learning.games.completed}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Average Game Score</span>
+                    <span className="text-gray-600">{t('averageGameScore')}</span>
                     <span className="text-2xl font-bold text-green-600">{analytics.learning.games.averageScore}%</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Modules Completed</span>
+                    <span className="text-gray-600">{t('modulesCompleted')}</span>
                     <span className="text-2xl font-bold text-purple-600">{analytics.learning.modules.completed}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Average Module Score</span>
+                    <span className="text-gray-600">{t('averageModuleScore')}</span>
                     <span className="text-2xl font-bold text-pink-600">{analytics.learning.modules.averageScore}%</span>
                   </div>
                 </div>
@@ -261,24 +263,24 @@ const MonitoringPage = () => {
             </div>
 
             {/* Safety Summary */}
-            <Card title="🛡️ Safety Summary">
+            <Card title={`🛡️ ${t('safetySummary')}`}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <div className="text-4xl mb-2">✅</div>
                   <div className="text-2xl font-bold text-green-600">{analytics.safety.safetyScore}/100</div>
-                  <div className="text-sm text-gray-600">Safety Score</div>
+                  <div className="text-sm text-gray-600">{t('safetyScore')}</div>
                 </div>
 
                 <div className="text-center p-4 bg-yellow-50 rounded-lg">
                   <div className="text-4xl mb-2">🚨</div>
                   <div className="text-2xl font-bold text-yellow-600">{analytics.safety.totalAlerts}</div>
-                  <div className="text-sm text-gray-600">Total Alerts</div>
+                  <div className="text-sm text-gray-600">{t('totalAlerts')}</div>
                 </div>
 
                 <div className="text-center p-4 bg-red-50 rounded-lg">
                   <div className="text-4xl mb-2">⚠️</div>
                   <div className="text-2xl font-bold text-red-600">{analytics.safety.unresolvedAlerts}</div>
-                  <div className="text-sm text-gray-600">Unresolved Alerts</div>
+                  <div className="text-sm text-gray-600">{t('unresolvedAlerts')}</div>
                 </div>
               </div>
 
@@ -290,7 +292,7 @@ const MonitoringPage = () => {
                     fullWidth
                   >
                     <span>⚠️</span>
-                    <span>View Safety Alerts</span>
+                    <span>{t('viewSafetyAlerts')}</span>
                   </Button>
                 </div>
               )}
@@ -344,8 +346,8 @@ const MonitoringPage = () => {
           <Card>
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📊</div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">No data available</h3>
-              <p className="text-gray-500">Add a child to start monitoring</p>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">{t('noDataAvailable')}</h3>
+              <p className="text-gray-500">{t('addChildToObserve')}</p>
             </div>
           </Card>
         )}

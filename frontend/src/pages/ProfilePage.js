@@ -6,17 +6,19 @@ import Navbar from '../components/common/Navbar';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import { authAPI } from '../services/api';
+import { useTranslation } from '../utils/translations';
 
 const ProfilePage = () => {
   const { user, updateUser } = useAuth();
-  
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
     phone: user?.phone || '',
     language: user?.language || 'ar'
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
@@ -39,9 +41,9 @@ const ProfilePage = () => {
     try {
       const response = await authAPI.updateProfile(formData);
       updateUser(response.data.data);
-      setSuccess('Profile updated successfully!');
+      setSuccess(t('profileUpdated'));
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update profile');
+      setError(err.response?.data?.message || t('failedToUpdateProfile'));
     } finally {
       setLoading(false);
     }
@@ -50,9 +52,9 @@ const ProfilePage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100">
       <Navbar />
-      
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-8">👤 My Profile</h1>
+        <h1 className="text-4xl font-bold text-gray-800 mb-8">👤 {t('myProfile')}</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Summary */}
@@ -64,13 +66,13 @@ const ProfilePage = () => {
               <h2 className="text-2xl font-bold text-gray-800 mb-1">{user?.name}</h2>
               <p className="text-gray-600 mb-2">{user?.email}</p>
               <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold capitalize">
-                {user?.role}
+                {user?.role === 'parent' ? t('parent') : t('teacher')}
               </span>
             </div>
           </Card>
 
           {/* Edit Form */}
-          <Card className="lg:col-span-2" title="Edit Profile">
+          <Card className="lg:col-span-2" title={t('editProfile')}>
             {success && (
               <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4">
                 {success}
@@ -86,7 +88,7 @@ const ProfilePage = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Full Name
+                  {t('fullName')}
                 </label>
                 <input
                   type="text"
@@ -100,7 +102,7 @@ const ProfilePage = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Email Address
+                  {t('emailAddress')}
                 </label>
                 <input
                   type="email"
@@ -114,7 +116,7 @@ const ProfilePage = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Phone Number
+                  {t('phoneNumber')}
                 </label>
                 <input
                   type="tel"
@@ -128,7 +130,7 @@ const ProfilePage = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Preferred Language
+                  {t('preferredLanguage')}
                 </label>
                 <select
                   name="language"
@@ -137,13 +139,13 @@ const ProfilePage = () => {
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
                   disabled={loading}
                 >
-                  <option value="en">English</option>
-                  <option value="ar">Arabic (العربية)</option>
+                  <option value="en">{t('english')}</option>
+                  <option value="ar">{t('arabic')}</option>
                 </select>
               </div>
 
               <Button type="submit" fullWidth disabled={loading}>
-                {loading ? 'Updating...' : 'Update Profile'}
+                {loading ? t('updating') : t('updateProfile')}
               </Button>
             </form>
           </Card>

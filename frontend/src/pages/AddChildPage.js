@@ -7,10 +7,12 @@ import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import { childrenAPI } from '../services/api';
 import { getAgeGroup } from '../utils/helpers';
+import { useTranslation } from '../utils/translations';
 
 const AddChildPage = () => {
   const navigate = useNavigate();
-  
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -20,7 +22,7 @@ const AddChildPage = () => {
     school: '',
     dailyScreenTimeLimit: 120
   });
-  
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -39,16 +41,16 @@ const AddChildPage = () => {
 
     // Validation
     if (!formData.name || !formData.username || !formData.dateOfBirth) {
-      setError('Please fill in all required fields');
+      setError(t('fillRequiredFields'));
       setLoading(false);
       return;
     }
 
     // Calculate age group
     const ageGroup = getAgeGroup(formData.dateOfBirth);
-    
+
     if (!ageGroup) {
-      setError('Child must be between 3 and 12 years old');
+      setError(t('ageRestriction'));
       setLoading(false);
       return;
     }
@@ -58,10 +60,10 @@ const AddChildPage = () => {
         ...formData,
         ageGroup
       });
-      
+
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to add child');
+      setError(err.response?.data?.message || t('failedToAddChild'));
     } finally {
       setLoading(false);
     }
@@ -70,13 +72,13 @@ const AddChildPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100">
       <Navbar />
-      
+
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card>
           <div className="text-center mb-8">
-            <div className="text-6xl mb-4"></div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Add Child Account</h1>
-            <p className="text-gray-600">Create a new account for your child</p>
+            <div className="text-6xl mb-4">👶</div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('addChildAccount')}</h1>
+            <p className="text-gray-600">{t('createChildAccountSubtitle')}</p>
           </div>
 
           {error && (
@@ -90,7 +92,7 @@ const AddChildPage = () => {
               {/* Child's Name */}
               <div>
                 <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Child's Full Name *
+                  {t('childFullName')} *
                 </label>
                 <input
                   type="text"
@@ -107,7 +109,7 @@ const AddChildPage = () => {
               {/* Username */}
               <div>
                 <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Username *
+                  {t('username')} *
                 </label>
                 <input
                   type="text"
@@ -124,7 +126,7 @@ const AddChildPage = () => {
               {/* Date of Birth */}
               <div>
                 <label htmlFor="dateOfBirth" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Date of Birth *
+                  {t('dateOfBirth')} *
                 </label>
                 <input
                   type="date"
@@ -140,7 +142,7 @@ const AddChildPage = () => {
               {/* Gender */}
               <div>
                 <label htmlFor="gender" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Gender
+                  {t('gender')}
                 </label>
                 <select
                   id="gender"
@@ -150,16 +152,16 @@ const AddChildPage = () => {
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
                   disabled={loading}
                 >
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Prefer not to say</option>
+                  <option value="male">{t('male')}</option>
+                  <option value="female">{t('female')}</option>
+                  <option value="other">{t('preferNotToSay')}</option>
                 </select>
               </div>
 
               {/* Grade Level */}
               <div>
                 <label htmlFor="gradeLevel" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Grade Level
+                  {t('gradeLevel')}
                 </label>
                 <input
                   type="text"
@@ -176,7 +178,7 @@ const AddChildPage = () => {
               {/* School */}
               <div>
                 <label htmlFor="school" className="block text-sm font-semibold text-gray-700 mb-2">
-                  School Name
+                  {t('schoolName')}
                 </label>
                 <input
                   type="text"
@@ -194,7 +196,7 @@ const AddChildPage = () => {
             {/* Screen Time Limit */}
             <div>
               <label htmlFor="dailyScreenTimeLimit" className="block text-sm font-semibold text-gray-700 mb-2">
-                Daily Screen Time Limit (minutes)
+                {t('dailyScreenTimeLimit')}
               </label>
               <input
                 type="number"
@@ -208,7 +210,7 @@ const AddChildPage = () => {
                 disabled={loading}
               />
               <p className="text-sm text-gray-500 mt-2">
-                Recommended: 120 minutes (2 hours) per day
+                {t('recommendedScreenTime')}
               </p>
             </div>
 
@@ -221,7 +223,7 @@ const AddChildPage = () => {
                 disabled={loading}
                 className="flex-1"
               >
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 type="submit"
@@ -231,12 +233,12 @@ const AddChildPage = () => {
                 {loading ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Adding...
+                    {t('adding')}
                   </>
                 ) : (
                   <>
                     <span>➕</span>
-                    <span>Add Child</span>
+                    <span>{t('addChild')}</span>
                   </>
                 )}
               </Button>
