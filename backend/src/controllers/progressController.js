@@ -37,7 +37,7 @@ exports.getChildProgress = async (req, res, next) => {
         total: gameProgress.length,
         completed: gameProgress.filter(p => p.status === 'completed').length,
         inProgress: gameProgress.filter(p => p.status === 'in-progress').length,
-        averageScore: gameProgress.length > 0 
+        averageScore: gameProgress.length > 0
           ? Math.round(gameProgress.reduce((sum, p) => sum + p.score, 0) / gameProgress.length)
           : 0,
         totalTimeSpent: Math.round(gameProgress.reduce((sum, p) => sum + p.timeSpent, 0) / 60) // minutes
@@ -203,7 +203,7 @@ exports.completeLesson = async (req, res, next) => {
       const module = await LearningModule.findById(moduleId);
       if (module) {
         progress.pointsEarned += module.pointsPerLesson || 50;
-        
+
         // Calculate completion percentage
         const totalLessons = module.lessons?.length || 0;
         const completedCount = progress.lessonsCompleted.length;
@@ -268,7 +268,13 @@ exports.getModuleProgress = async (req, res, next) => {
 // @access  Public
 exports.getLeaderboard = async (req, res, next) => {
   try {
-    const { type = 'global', period = 'weekly', ageGroup } = req.query;
+    const { type = 'children', period = 'all-time' } = req.query;
+    let { ageGroup } = req.query;
+
+    // Normalize ageGroup
+    if (!ageGroup || ageGroup === '' || ageGroup === 'null' || ageGroup === 'undefined') {
+      ageGroup = null;
+    }
 
     // Calculate period dates
     const today = new Date();
@@ -288,6 +294,10 @@ exports.getLeaderboard = async (req, res, next) => {
     } else if (period === 'monthly') {
       periodStart = new Date(today.getFullYear(), today.getMonth(), 1);
       periodEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+    } else {
+      // Default to all-time (large range)
+      periodStart = new Date(2000, 0, 1);
+      periodEnd = new Date(2100, 0, 1);
     }
 
     // Find leaderboard
@@ -297,8 +307,10 @@ exports.getLeaderboard = async (req, res, next) => {
       periodStart: periodStart
     };
 
-    if (type === 'age-group' && ageGroup) {
-      query.ageGroup = ageGroup;
+    if (type === 'age-group') {
+      if (ageGroup) query.ageGroup = ageGroup;
+    } else {
+      query.ageGroup = null;
     }
 
     let leaderboard = await Leaderboard.findOne(query)
@@ -307,7 +319,7 @@ exports.getLeaderboard = async (req, res, next) => {
         select: 'name username avatar level'
       });
 
-    // If leaderboard doesn't exist, create it
+    // If leaderboard doesn't exist, create it and sync
     if (!leaderboard) {
       leaderboard = await Leaderboard.create({
         type: type,
@@ -317,6 +329,28 @@ exports.getLeaderboard = async (req, res, next) => {
         periodEnd: periodEnd,
         rankings: []
       });
+
+      // Sync data if empty
+      const gamification = require('../utils/gamification');
+      await gamification.syncLeaderboards();
+
+      // Re-fetch with rankings
+      leaderboard = await Leaderboard.findById(leaderboard._id)
+        .populate({
+          path: 'rankings.child',
+          select: 'name username avatar level'
+        });
+    } else if (leaderboard.rankings.length === 0) {
+      // Sync if rankings are empty
+      const gamification = require('../utils/gamification');
+      await gamification.syncLeaderboards();
+
+      // Re-fetch
+      leaderboard = await Leaderboard.findById(leaderboard._id)
+        .populate({
+          path: 'rankings.child',
+          select: 'name username avatar level'
+        });
     }
 
     res.status(200).json({
@@ -328,9 +362,29 @@ exports.getLeaderboard = async (req, res, next) => {
         periodStart: leaderboard.periodStart,
         periodEnd: leaderboard.periodEnd,
         lastUpdated: leaderboard.lastUpdated,
-        rankings: leaderboard.rankings.slice(0, 100) // Top 100
+        rankings: leaderboard.rankings
+          .filter(r => r.child) // Filter out null children (deleted/orphaned)
+          .slice(0, 100) // Top 100
       }
     });
+
+    // Background cleanup of duplicates if any exist
+    if (leaderboard && leaderboard.rankings.length > 0) {
+      const seen = new Set();
+      const initialCount = leaderboard.rankings.length;
+      const uniqueRankings = leaderboard.rankings.filter(r => {
+        if (!r.child) return false; // This also cleans up the DB on next fetch
+        const id = r.child._id ? r.child._id.toString() : r.child.toString();
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      });
+
+      if (uniqueRankings.length !== initialCount) {
+        leaderboard.rankings = uniqueRankings;
+        await leaderboard.save();
+      }
+    }
 
   } catch (error) {
     next(error);
@@ -368,7 +422,7 @@ exports.getChildRank = async (req, res, next) => {
 
     // Find in global leaderboard
     const globalLeaderboard = await Leaderboard.findOne({
-      type: 'global',
+      type: 'children',
       period: period,
       periodStart: periodStart
     });
@@ -477,8 +531,8 @@ exports.getSubjectProgress = async (req, res, next) => {
     // Calculate averages
     Object.keys(subjectStats).forEach(subject => {
       const stats = subjectStats[subject];
-      stats.averageScore = stats.count > 0 
-        ? Math.round(stats.totalScore / stats.count) 
+      stats.averageScore = stats.count > 0
+        ? Math.round(stats.totalScore / stats.count)
         : 0;
       stats.timeSpent = Math.round(stats.timeSpent / 60); // Convert to minutes
       delete stats.totalScore;
@@ -518,7 +572,7 @@ exports.getChildAchievements = async (req, res, next) => {
 
     // Get all available achievements
     const Achievement = require('../models/Achievement');
-    const allAchievements = await Achievement.find({ 
+    const allAchievements = await Achievement.find({
       isActive: true,
       ageGroups: child.ageGroup
     });
