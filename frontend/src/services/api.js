@@ -4,7 +4,7 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json'
   }
@@ -28,11 +28,26 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Log error for debugging
+    if (error.response) {
+      // Server responded with error
+      console.error('API Error:', error.response.status, error.response.data);
+    } else if (error.request) {
+      // Request made but no response (backend not running or network error)
+      console.error('API Error: No response from server. Is backend running?', error.request);
+    } else {
+      // Error setting up request
+      console.error('API Error:', error.message);
+    }
+    
     // If unauthorized, redirect to login
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Don't redirect if we're already on login page
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
@@ -77,6 +92,7 @@ export const gamesAPI = {
   getFeatured: (ageGroup) => api.get('/games/featured', { params: { ageGroup } }),
   getByCategory: (category, ageGroup) => api.get(`/games/category/${category}`, { params: { ageGroup } }),
   start: (id, childId) => api.post(`/games/${id}/start`, { childId }),
+  complete: (id, data) => api.post(`/games/${id}/complete`, data),
   rate: (id, rating, childId) => api.post(`/games/${id}/rate`, { rating, childId }),
   create: (gameData) => api.post('/games', gameData),
   update: (id, gameData) => api.put(`/games/${id}`, gameData),

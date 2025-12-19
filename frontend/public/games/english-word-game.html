@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Builder - English</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #f5576c;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        
+        .word-display {
+            font-size: 3em;
+            text-align: center;
+            margin: 30px 0;
+            color: #f5576c;
+            font-weight: bold;
+            letter-spacing: 10px;
+        }
+        
+        .hint {
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .letters-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .letter-btn {
+            padding: 15px 20px;
+            font-size: 1.5em;
+            border: 3px solid #f5576c;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            color: #f5576c;
+            min-width: 60px;
+        }
+        
+        .letter-btn:hover {
+            background: #f5576c;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .letter-btn.used {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .selected-letters {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            min-height: 80px;
+            align-items: center;
+        }
+        
+        .selected-letter {
+            padding: 15px 20px;
+            font-size: 2em;
+            border: 3px solid #f5576c;
+            background: #f5576c;
+            color: white;
+            border-radius: 10px;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .control-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .check-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .clear-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 1.5em;
+            margin: 20px 0;
+            color: #f5576c;
+            font-weight: bold;
+        }
+        
+        .game-over {
+            text-align: center;
+            display: none;
+        }
+        
+        .game-over.show {
+            display: block;
+        }
+        
+        .final-score {
+            font-size: 4em;
+            color: #f5576c;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>📚 Word Builder</h1>
+        
+        <div class="score-display">
+            Score: <span id="score">0</span> / <span id="total-words">5</span>
+        </div>
+        
+        <div id="game-area">
+            <div class="hint" id="hint">Hint: Click letters to build the word</div>
+            <div class="word-display" id="word-display">_ _ _ _</div>
+            
+            <div class="selected-letters" id="selected-letters"></div>
+            
+            <div class="letters-container" id="letters-container"></div>
+            
+            <div class="controls">
+                <button class="control-btn check-btn" onclick="checkWord()">✓ Check</button>
+                <button class="control-btn clear-btn" onclick="clearSelection()">Clear</button>
+            </div>
+        </div>
+        
+        <div class="game-over" id="game-over">
+            <div style="font-size: 5em; margin-bottom: 20px;">🎉</div>
+            <h2>Great Job!</h2>
+            <div class="final-score" id="final-score">0%</div>
+            <p style="font-size: 1.2em; color: #666; margin-top: 10px;">Your score has been recorded!</p>
+        </div>
+    </div>
+
+    <script>
+        let currentWord = 0;
+        let score = 0;
+        let selectedLetters = [];
+        let words = [
+            { word: 'CAT', hint: 'A furry pet that says meow', letters: ['C', 'A', 'T', 'D', 'O', 'G'] },
+            { word: 'DOG', hint: 'A loyal pet that barks', letters: ['D', 'O', 'G', 'C', 'A', 'T'] },
+            { word: 'SUN', hint: 'Bright star in the sky', letters: ['S', 'U', 'N', 'M', 'O', 'O'] },
+            { word: 'MOON', hint: 'Shines at night', letters: ['M', 'O', 'O', 'N', 'S', 'T'] },
+            { word: 'STAR', hint: 'Twinkles in the sky', letters: ['S', 'T', 'A', 'R', 'B', 'Y'] }
+        ];
+        
+        function startGame() {
+            showWord();
+        }
+        
+        function showWord() {
+            if (currentWord >= words.length) {
+                endGame();
+                return;
+            }
+            
+            const wordData = words[currentWord];
+            selectedLetters = [];
+            
+            document.getElementById('hint').textContent = `Hint: ${wordData.hint}`;
+            document.getElementById('word-display').textContent = '_ '.repeat(wordData.word.length).trim();
+            document.getElementById('selected-letters').innerHTML = '';
+            
+            const lettersContainer = document.getElementById('letters-container');
+            lettersContainer.innerHTML = '';
+            
+            wordData.letters.sort(() => Math.random() - 0.5).forEach((letter, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'letter-btn';
+                btn.textContent = letter;
+                btn.onclick = () => selectLetter(letter, btn);
+                lettersContainer.appendChild(btn);
+            });
+        }
+        
+        function selectLetter(letter, buttonElement) {
+            if (buttonElement.classList.contains('used')) return;
+            
+            selectedLetters.push(letter);
+            buttonElement.classList.add('used');
+            
+            const selectedDiv = document.createElement('div');
+            selectedDiv.className = 'selected-letter';
+            selectedDiv.textContent = letter;
+            selectedDiv.onclick = () => removeLetter(letter, selectedDiv, buttonElement);
+            document.getElementById('selected-letters').appendChild(selectedDiv);
+            
+            updateWordDisplay();
+        }
+        
+        function removeLetter(letter, selectedDiv, buttonElement) {
+            const index = selectedLetters.indexOf(letter);
+            if (index > -1) {
+                selectedLetters.splice(index, 1);
+                selectedDiv.remove();
+                buttonElement.classList.remove('used');
+                updateWordDisplay();
+            }
+        }
+        
+        function updateWordDisplay() {
+            const wordData = words[currentWord];
+            let display = '';
+            for (let i = 0; i < wordData.word.length; i++) {
+                display += (selectedLetters[i] || '_') + ' ';
+            }
+            document.getElementById('word-display').textContent = display.trim();
+        }
+        
+        function clearSelection() {
+            selectedLetters = [];
+            document.getElementById('selected-letters').innerHTML = '';
+            document.querySelectorAll('.letter-btn').forEach(btn => {
+                btn.classList.remove('used');
+            });
+            updateWordDisplay();
+        }
+        
+        function checkWord() {
+            const wordData = words[currentWord];
+            const userWord = selectedLetters.join('');
+            
+            if (userWord === wordData.word) {
+                score++;
+                document.getElementById('score').textContent = score;
+                alert('Correct! 🎉');
+                currentWord++;
+                setTimeout(() => {
+                    if (currentWord < words.length) {
+                        showWord();
+                    } else {
+                        endGame();
+                    }
+                }, 1000);
+            } else {
+                alert('Try again! 💪');
+            }
+        }
+        
+        function endGame() {
+            document.getElementById('game-area').style.display = 'none';
+            document.getElementById('game-over').classList.add('show');
+            
+            const percentage = Math.round((score / words.length) * 100);
+            document.getElementById('final-score').textContent = percentage + '%';
+            
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'GAME_SCORE',
+                    score: percentage,
+                    level: 1,
+                    completed: true
+                }, '*');
+            }
+        }
+        
+        window.addEventListener('load', () => {
+            setTimeout(startGame, 500);
+        });
+    </script>
+</body>
+</html>
+

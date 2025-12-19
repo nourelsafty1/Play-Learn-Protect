@@ -3,6 +3,7 @@
 const Game = require('../models/Game');
 const Progress = require('../models/Progress');
 const Child = require('../models/Child');
+const crypto = require('crypto');
 
 // @desc    Get all games
 // @route   GET /api/games
@@ -319,7 +320,7 @@ exports.startGame = async (req, res, next) => {
     await game.incrementPlayCount();
 
     // generate a new session ID for THIS play session
-    const sessionId = crypto.randomUUID();
+    const sessionId = crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(16).toString('hex');
 
     // create a NEW progress entry per session
     const progress = await Progress.create({
@@ -354,4 +355,112 @@ exports.startGame = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Complete a game and submit score
+// @route   POST /api/games/:id/complete
+// @access  Private
+exports.completeGame = async (req, res, next) => {
+  try {
+    const { childId, score, timeSpent, level, completed, sessionId } = req.body;
+
+    if (!childId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Child ID is required'
+      });
+    }
+
+    const game = await Game.findById(req.params.id);
+    if (!game) {
+      return res.status(404).json({
+        success: false,
+        message: 'Game not found'
+      });
+    }
+
+    // Find or create progress entry
+    let progress = await Progress.findOne({
+      child: childId,
+      game: game._id,
+      sessionId: sessionId || null
+    });
+
+    if (!progress) {
+      // Create new progress if not found
+      progress = await Progress.create({
+        child: childId,
+        contentType: 'game',
+        game: game._id,
+        sessionId: sessionId || null,
+        status: 'in-progress',
+        startedAt: new Date()
+      });
+    }
+
+    // Update progress with score and completion
+    progress.score = score || 0;
+    progress.timeSpent = timeSpent || 0;
+    progress.lastAccessedAt = new Date();
+
+    if (level) {
+      progress.currentLevel = level;
+      if (!progress.levelsCompleted.some(l => l.levelNumber === level)) {
+        progress.levelsCompleted.push({
+          levelNumber: level,
+          completedAt: new Date(),
+          score: score || 0
+        });
+      }
+    }
+
+    // Update best score
+    if (score && score > progress.bestScore) {
+      progress.bestScore = score;
+    }
+
+    // If completed, mark as completed and award points
+    if (completed) {
+      progress.status = 'completed';
+      progress.completedAt = new Date();
+
+      // Calculate points earned
+      const basePoints = game.pointsPerCompletion || 100;
+      const bonusPoints = score >= 80 ? (game.bonusPoints || 50) : 0;
+      const pointsEarned = basePoints + bonusPoints;
+      progress.pointsEarned = pointsEarned;
+
+      // Add points to child
+      const child = await Child.findById(childId);
+      if (child) {
+        child.addPoints(pointsEarned);
+        child.completedGames.push({
+          game: game._id,
+          completedAt: new Date(),
+          score: score || 0
+        });
+        await child.save();
+      }
+    }
+
+    await progress.save();
+
+    // Check for achievements
+    const gamification = require('../utils/gamification');
+    const newAchievements = await gamification.checkAchievements(childId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Game progress updated',
+      data: {
+        progress: progress,
+        pointsEarned: completed ? (game.pointsPerCompletion || 100) + (score >= 80 ? (game.bonusPoints || 50) : 0) : 0,
+        achievements: newAchievements
+      }
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = exports;

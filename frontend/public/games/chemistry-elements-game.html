@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemistry Elements Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #a8edea;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        
+        .element-card {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 15px 0;
+            color: white;
+            text-align: center;
+        }
+        
+        .element-symbol {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .element-name {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .option-btn {
+            padding: 15px;
+            font-size: 1.1em;
+            border: 3px solid #a8edea;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .option-btn:hover {
+            background: #a8edea;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .option-btn.correct {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        
+        .option-btn.wrong {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 1.5em;
+            margin: 20px 0;
+            color: #a8edea;
+            font-weight: bold;
+        }
+        
+        .game-over {
+            text-align: center;
+            display: none;
+        }
+        
+        .game-over.show {
+            display: block;
+        }
+        
+        .final-score {
+            font-size: 4em;
+            color: #a8edea;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🧪 Chemistry Elements</h1>
+        
+        <div class="score-display">
+            Question: <span id="current-q">1</span>/<span id="total-q">5</span> | Score: <span id="score">0</span>
+        </div>
+        
+        <div id="game-area">
+            <div class="element-card">
+                <div class="element-symbol" id="element-symbol">H</div>
+                <div class="element-name">What is this element?</div>
+            </div>
+            <div class="options" id="options"></div>
+        </div>
+        
+        <div class="game-over" id="game-over">
+            <div style="font-size: 5em; margin-bottom: 20px;">🎉</div>
+            <h2>Great Job!</h2>
+            <div class="final-score" id="final-score">0%</div>
+            <p style="font-size: 1.2em; color: #666; margin-top: 10px;">Your score has been recorded!</p>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let score = 0;
+        let questions = [];
+        
+        function generateQuestions() {
+            questions = [
+                { symbol: 'H', correct: 'Hydrogen', options: ['Hydrogen', 'Helium', 'Oxygen', 'Carbon'] },
+                { symbol: 'O', correct: 'Oxygen', options: ['Oxygen', 'Gold', 'Silver', 'Iron'] },
+                { symbol: 'C', correct: 'Carbon', options: ['Carbon', 'Calcium', 'Chlorine', 'Copper'] },
+                { symbol: 'Fe', correct: 'Iron', options: ['Iron', 'Iodine', 'Indium', 'Iridium'] },
+                { symbol: 'Au', correct: 'Gold', options: ['Gold', 'Silver', 'Copper', 'Aluminum'] }
+            ];
+        }
+        
+        function startGame() {
+            generateQuestions();
+            showQuestion();
+        }
+        
+        function showQuestion() {
+            if (currentQuestion >= questions.length) {
+                endGame();
+                return;
+            }
+            
+            const q = questions[currentQuestion];
+            document.getElementById('element-symbol').textContent = q.symbol;
+            document.getElementById('current-q').textContent = currentQuestion + 1;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            q.options.sort(() => Math.random() - 0.5).forEach((option) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => selectAnswer(option, q.correct, btn);
+                optionsDiv.appendChild(btn);
+            });
+        }
+        
+        function selectAnswer(selected, correct, buttonElement) {
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === correct) {
+                    btn.classList.add('correct');
+                } else if (btn === buttonElement && selected !== correct) {
+                    btn.classList.add('wrong');
+                }
+            });
+            
+            if (selected === correct) {
+                score += 20;
+                document.getElementById('score').textContent = score;
+            }
+            
+            currentQuestion++;
+            
+            setTimeout(() => {
+                if (currentQuestion < questions.length) {
+                    showQuestion();
+                } else {
+                    endGame();
+                }
+            }, 1500);
+        }
+        
+        function endGame() {
+            document.getElementById('game-area').style.display = 'none';
+            document.getElementById('game-over').classList.add('show');
+            
+            const percentage = Math.round((score / 100) * 100);
+            document.getElementById('final-score').textContent = percentage + '%';
+            
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'GAME_SCORE',
+                    score: percentage,
+                    level: 1,
+                    completed: true
+                }, '*');
+            }
+        }
+        
+        window.addEventListener('load', () => {
+            setTimeout(startGame, 500);
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Quest - Sequences</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4facfe;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        
+        .task {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .task-instruction {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .robot-area {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            min-height: 200px;
+            position: relative;
+        }
+        
+        .robot {
+            width: 60px;
+            height: 60px;
+            background: #4facfe;
+            border-radius: 10px;
+            position: absolute;
+            transition: all 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: white;
+        }
+        
+        .code-blocks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .code-block {
+            padding: 15px 20px;
+            background: #4facfe;
+            color: white;
+            border-radius: 10px;
+            cursor: move;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: 3px solid transparent;
+        }
+        
+        .code-block:hover {
+            border-color: #00f2fe;
+            transform: scale(1.05);
+        }
+        
+        .sequence-area {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 100px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .sequence-block {
+            padding: 15px 20px;
+            background: #28a745;
+            color: white;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .sequence-block:hover {
+            background: #dc3545;
+        }
+        
+        .run-btn {
+            padding: 15px 40px;
+            font-size: 1.3em;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 20px auto;
+            display: block;
+        }
+        
+        .run-btn:hover {
+            background: #218838;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 1.5em;
+            margin: 20px 0;
+            color: #4facfe;
+            font-weight: bold;
+        }
+        
+        .game-over {
+            text-align: center;
+            display: none;
+        }
+        
+        .game-over.show {
+            display: block;
+        }
+        
+        .final-score {
+            font-size: 4em;
+            color: #4facfe;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>💻 Coding Quest</h1>
+        
+        <div class="score-display">
+            Level: <span id="level">1</span> / 5 | Score: <span id="score">0</span>
+        </div>
+        
+        <div id="game-area">
+            <div class="task">
+                <div class="task-instruction" id="instruction">Move the robot to the target!</div>
+                <div class="robot-area" id="robot-area">
+                    <div class="robot" id="robot">🤖</div>
+                </div>
+            </div>
+            
+            <div>
+                <h3 style="color: #333; margin-bottom: 10px;">Drag blocks to build your code:</h3>
+                <div class="code-blocks" id="code-blocks"></div>
+            </div>
+            
+            <div>
+                <h3 style="color: #333; margin-bottom: 10px;">Your code sequence:</h3>
+                <div class="sequence-area" id="sequence-area"></div>
+            </div>
+            
+            <button class="run-btn" onclick="runCode()">▶ Run Code</button>
+        </div>
+        
+        <div class="game-over" id="game-over">
+            <div style="font-size: 5em; margin-bottom: 20px;">🎉</div>
+            <h2>Excellent Coding!</h2>
+            <div class="final-score" id="final-score">0%</div>
+            <p style="font-size: 1.2em; color: #666; margin-top: 10px;">Your score has been recorded!</p>
+        </div>
+    </div>
+
+    <script>
+        let level = 1;
+        let score = 0;
+        let sequence = [];
+        let robotPosition = { x: 0, y: 0 };
+        let targetPosition = { x: 0, y: 0 };
+        let tasks = [
+            { instruction: 'Move the robot 3 steps forward', solution: ['move(3)'], target: { x: 150, y: 0 } },
+            { instruction: 'Move forward 2 steps, then turn right', solution: ['move(2)', 'turn(90)'], target: { x: 100, y: 100 } },
+            { instruction: 'Move 3 steps, turn right, move 2 steps', solution: ['move(3)', 'turn(90)', 'move(2)'], target: { x: 150, y: 100 } },
+            { instruction: 'Move 2, turn, move 2, turn, move 2', solution: ['move(2)', 'turn(90)', 'move(2)', 'turn(90)', 'move(2)'], target: { x: 100, y: 100 } },
+            { instruction: 'Create a square: move 3, turn, repeat 4 times', solution: ['move(3)', 'turn(90)', 'move(3)', 'turn(90)', 'move(3)', 'turn(90)', 'move(3)', 'turn(90)'], target: { x: 0, y: 0 } }
+        ];
+        
+        const availableBlocks = [
+            'move(1)', 'move(2)', 'move(3)',
+            'turn(90)', 'turn(180)',
+            'jump()', 'wait()'
+        ];
+        
+        function startGame() {
+            showLevel();
+        }
+        
+        function showLevel() {
+            if (level > tasks.length) {
+                endGame();
+                return;
+            }
+            
+            const task = tasks[level - 1];
+            document.getElementById('instruction').textContent = task.instruction;
+            document.getElementById('level').textContent = level;
+            
+            robotPosition = { x: 0, y: 0 };
+            targetPosition = task.target;
+            sequence = [];
+            
+            updateRobotPosition();
+            updateTarget();
+            setupCodeBlocks();
+            document.getElementById('sequence-area').innerHTML = '';
+        }
+        
+        function setupCodeBlocks() {
+            const container = document.getElementById('code-blocks');
+            container.innerHTML = '';
+            
+            availableBlocks.forEach(block => {
+                const div = document.createElement('div');
+                div.className = 'code-block';
+                div.textContent = block;
+                div.onclick = () => addToSequence(block, div);
+                container.appendChild(div);
+            });
+        }
+        
+        function addToSequence(block, element) {
+            sequence.push(block);
+            const seqDiv = document.createElement('div');
+            seqDiv.className = 'sequence-block';
+            seqDiv.textContent = block;
+            seqDiv.onclick = () => removeFromSequence(block, seqDiv);
+            document.getElementById('sequence-area').appendChild(seqDiv);
+        }
+        
+        function removeFromSequence(block, element) {
+            const index = sequence.indexOf(block);
+            if (index > -1) {
+                sequence.splice(index, 1);
+                element.remove();
+            }
+        }
+        
+        function updateRobotPosition() {
+            const robot = document.getElementById('robot');
+            robot.style.left = (robotPosition.x + 20) + 'px';
+            robot.style.top = (robotPosition.y + 20) + 'px';
+        }
+        
+        function updateTarget() {
+            const robotArea = document.getElementById('robot-area');
+            let target = document.getElementById('target');
+            if (!target) {
+                target = document.createElement('div');
+                target.id = 'target';
+                target.style.cssText = 'width: 40px; height: 40px; background: #ffc107; border-radius: 50%; position: absolute; border: 3px solid #ff9800;';
+                robotArea.appendChild(target);
+            }
+            target.style.left = (targetPosition.x + 20) + 'px';
+            target.style.top = (targetPosition.y + 20) + 'px';
+        }
+        
+        function runCode() {
+            robotPosition = { x: 0, y: 0 };
+            updateRobotPosition();
+            
+            let currentAngle = 0;
+            let step = 0;
+            
+            function executeNext() {
+                if (step >= sequence.length) {
+                    checkResult();
+                    return;
+                }
+                
+                const command = sequence[step];
+                
+                if (command.startsWith('move(')) {
+                    const steps = parseInt(command.match(/\d+/)[0]);
+                    const angle = currentAngle * Math.PI / 180;
+                    robotPosition.x += Math.cos(angle) * steps * 50;
+                    robotPosition.y += Math.sin(angle) * steps * 50;
+                    updateRobotPosition();
+                } else if (command.startsWith('turn(')) {
+                    const degrees = parseInt(command.match(/\d+/)[0]);
+                    currentAngle += degrees;
+                }
+                
+                step++;
+                setTimeout(executeNext, 500);
+            }
+            
+            executeNext();
+        }
+        
+        function checkResult() {
+            const task = tasks[level - 1];
+            const distance = Math.sqrt(
+                Math.pow(robotPosition.x - targetPosition.x, 2) + 
+                Math.pow(robotPosition.y - targetPosition.y, 2)
+            );
+            
+            if (distance < 30) {
+                score += 20;
+                document.getElementById('score').textContent = score;
+                alert('Perfect! 🎉');
+                level++;
+                setTimeout(() => {
+                    if (level <= tasks.length) {
+                        showLevel();
+                    } else {
+                        endGame();
+                    }
+                }, 1000);
+            } else {
+                alert('Not quite right. Try again! 💪');
+            }
+        }
+        
+        function endGame() {
+            document.getElementById('game-area').style.display = 'none';
+            document.getElementById('game-over').classList.add('show');
+            
+            const percentage = Math.round((score / 100) * 100);
+            document.getElementById('final-score').textContent = percentage + '%';
+            
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'GAME_SCORE',
+                    score: percentage,
+                    level: level - 1,
+                    completed: true
+                }, '*');
+            }
+        }
+        
+        window.addEventListener('load', () => {
+            setTimeout(startGame, 500);
+        });
+    </script>
+</body>
+</html>
+

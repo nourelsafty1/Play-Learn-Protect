@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Challenge - Advanced</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .challenge-badge {
+            text-align: center;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+        
+        .score-item {
+            text-align: center;
+        }
+        
+        .score-item .label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .score-item .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .bonus-indicator {
+            background: #ffd700;
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .challenge-area {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            min-height: 300px;
+            position: relative;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 60px);
+            grid-template-rows: repeat(5, 60px);
+            gap: 5px;
+            margin: 20px auto;
+            width: fit-content;
+        }
+        
+        .grid-cell {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            background: white;
+            transition: all 0.3s;
+        }
+        
+        .grid-cell.target {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        
+        .grid-cell.robot {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .grid-cell.obstacle {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        
+        .code-editor {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-blocks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .code-block {
+            padding: 12px 18px;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            cursor: move;
+            font-size: 1em;
+            font-weight: bold;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .code-block:hover {
+            border-color: #764ba2;
+            transform: scale(1.05);
+        }
+        
+        .code-block.used {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .sequence-area {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 80px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .sequence-block {
+            padding: 12px 18px;
+            background: #28a745;
+            color: white;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sequence-block:hover {
+            background: #dc3545;
+            transform: scale(1.1);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .control-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .run-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .run-btn:hover {
+            background: #218838;
+        }
+        
+        .clear-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .clear-btn:hover {
+            background: #c82333;
+        }
+        
+        .challenge-instruction {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        
+        .bonus-info {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            color: #856404;
+            font-weight: bold;
+        }
+        
+        .game-over {
+            text-align: center;
+            display: none;
+        }
+        
+        .game-over.show {
+            display: block;
+        }
+        
+        .final-score {
+            font-size: 4em;
+            color: #667eea;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .bonus-earned {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>💻 Advanced Coding Challenge</h1>
+        <div class="challenge-badge">🔥 CHALLENGE MODE - BONUS POINTS AVAILABLE 🔥</div>
+        
+        <div class="score-board">
+            <div class="score-item">
+                <div class="label">Challenge</div>
+                <div class="value"><span id="current-challenge">1</span>/<span id="total-challenges">5</span></div>
+            </div>
+            <div class="score-item">
+                <div class="label">Score</div>
+                <div class="value"><span id="score">0</span></div>
+            </div>
+            <div class="score-item">
+                <div class="label">Bonus</div>
+                <div class="value"><span id="bonus">0</span></div>
+            </div>
+            <div class="score-item">
+                <div class="label">Total</div>
+                <div class="value"><span id="total-score">0</span></div>
+            </div>
+        </div>
+        
+        <div id="game-area">
+            <div class="challenge-instruction" id="instruction">
+                Challenge 1: Move the robot to collect all coins using loops!
+            </div>
+            
+            <div class="bonus-info">
+                ⭐ BONUS: Complete in minimum moves for +50 bonus points! ⭐
+            </div>
+            
+            <div class="challenge-area">
+                <div class="grid-container" id="grid"></div>
+            </div>
+            
+            <div>
+                <h3 style="color: #333; margin-bottom: 10px;">Build your code:</h3>
+                <div class="code-blocks" id="code-blocks"></div>
+            </div>
+            
+            <div>
+                <h3 style="color: #333; margin-bottom: 10px;">Your code sequence:</h3>
+                <div class="sequence-area" id="sequence-area"></div>
+            </div>
+            
+            <div class="controls">
+                <button class="control-btn run-btn" onclick="runCode()">▶ Run Code</button>
+                <button class="control-btn clear-btn" onclick="clearSequence()">Clear</button>
+            </div>
+        </div>
+        
+        <div class="game-over" id="game-over">
+            <div style="font-size: 5em; margin-bottom: 20px;">🏆</div>
+            <h2>Challenge Complete!</h2>
+            <div class="final-score" id="final-score">0</div>
+            <div id="bonus-display"></div>
+            <p style="font-size: 1.2em; color: #666; margin-top: 10px;">Your score has been recorded!</p>
+        </div>
+    </div>
+
+    <script>
+        let currentChallenge = 0;
+        let score = 0;
+        let bonusPoints = 0;
+        let sequence = [];
+        let robotPosition = { x: 0, y: 0 };
+        let targetPositions = [];
+        let obstacles = [];
+        let challenges = [];
+        let moveCount = 0;
+        let optimalMoves = [];
+        
+        const availableBlocks = [
+            'move()', 'turnLeft()', 'turnRight()', 
+            'for(3)', 'for(4)', 'for(5)',
+            'if(coin)', 'collect()', 'jump()'
+        ];
+        
+        function initChallenges() {
+            challenges = [
+                {
+                    instruction: 'Challenge 1: Collect all 3 coins using a loop!',
+                    robot: { x: 0, y: 0 },
+                    targets: [{ x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 }],
+                    obstacles: [],
+                    optimal: ['for(3)', 'move()', 'collect()'],
+                    baseScore: 100
+                },
+                {
+                    instruction: 'Challenge 2: Navigate around obstacles to collect coins!',
+                    robot: { x: 0, y: 0 },
+                    targets: [{ x: 2, y: 0 }, { x: 4, y: 2 }],
+                    obstacles: [{ x: 1, y: 0 }],
+                    optimal: ['move()', 'turnRight()', 'move()', 'move()', 'turnLeft()', 'move()', 'move()', 'collect()'],
+                    baseScore: 150
+                },
+                {
+                    instruction: 'Challenge 3: Use nested loops to collect coins in a pattern!',
+                    robot: { x: 0, y: 0 },
+                    targets: [{ x: 1, y: 0 }, { x: 2, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }],
+                    obstacles: [],
+                    optimal: ['for(2)', 'for(2)', 'move()', 'collect()', 'turnRight()', 'move()', 'turnLeft()'],
+                    baseScore: 200
+                },
+                {
+                    instruction: 'Challenge 4: Complex path with multiple turns and jumps!',
+                    robot: { x: 0, y: 0 },
+                    targets: [{ x: 4, y: 4 }],
+                    obstacles: [{ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 3 }],
+                    optimal: ['move()', 'jump()', 'move()', 'jump()', 'move()', 'jump()', 'move()', 'collect()'],
+                    baseScore: 250
+                },
+                {
+                    instruction: 'Challenge 5: Master level - Optimize your code for maximum bonus!',
+                    robot: { x: 0, y: 0 },
+                    targets: [{ x: 1, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 2 }, { x: 4, y: 3 }],
+                    obstacles: [{ x: 1, y: 1 }, { x: 2, y: 2 }],
+                    optimal: ['move()', 'collect()', 'turnRight()', 'move()', 'jump()', 'collect()', 'turnRight()', 'move()', 'jump()', 'collect()', 'turnRight()', 'move()', 'collect()'],
+                    baseScore: 300
+                }
+            ];
+        }
+        
+        function startGame() {
+            initChallenges();
+            showChallenge();
+        }
+        
+        function showChallenge() {
+            if (currentChallenge >= challenges.length) {
+                endGame();
+                return;
+            }
+            
+            const challenge = challenges[currentChallenge];
+            robotPosition = { ...challenge.robot };
+            targetPositions = [...challenge.targets];
+            obstacles = [...challenge.obstacles];
+            optimalMoves = challenge.optimal;
+            moveCount = 0;
+            sequence = [];
+            
+            document.getElementById('instruction').textContent = challenge.instruction;
+            document.getElementById('current-challenge').textContent = currentChallenge + 1;
+            
+            setupGrid();
+            setupCodeBlocks();
+            document.getElementById('sequence-area').innerHTML = '';
+        }
+        
+        function setupGrid() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            
+            for (let y = 0; y < 5; y++) {
+                for (let x = 0; x < 5; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    cell.id = `cell-${x}-${y}`;
+                    
+                    if (x === robotPosition.x && y === robotPosition.y) {
+                        cell.classList.add('robot');
+                        cell.textContent = '🤖';
+                    } else if (obstacles.some(o => o.x === x && o.y === y)) {
+                        cell.classList.add('obstacle');
+                        cell.textContent = '🚫';
+                    } else if (targetPositions.some(t => t.x === x && t.y === y)) {
+                        cell.classList.add('target');
+                        cell.textContent = '💰';
+                    }
+                    
+                    grid.appendChild(cell);
+                }
+            }
+        }
+        
+        function setupCodeBlocks() {
+            const container = document.getElementById('code-blocks');
+            container.innerHTML = '';
+            
+            availableBlocks.forEach(block => {
+                const div = document.createElement('div');
+                div.className = 'code-block';
+                div.textContent = block;
+                div.onclick = () => addToSequence(block, div);
+                container.appendChild(div);
+            });
+        }
+        
+        function addToSequence(block, element) {
+            if (element.classList.contains('used')) return;
+            
+            sequence.push(block);
+            const seqDiv = document.createElement('div');
+            seqDiv.className = 'sequence-block';
+            seqDiv.textContent = block;
+            seqDiv.onclick = () => removeFromSequence(block, seqDiv, element);
+            document.getElementById('sequence-area').appendChild(seqDiv);
+        }
+        
+        function removeFromSequence(block, element, codeBlock) {
+            const index = sequence.indexOf(block);
+            if (index > -1) {
+                sequence.splice(index, 1);
+                element.remove();
+                if (codeBlock) codeBlock.classList.remove('used');
+            }
+        }
+        
+        function clearSequence() {
+            sequence = [];
+            document.getElementById('sequence-area').innerHTML = '';
+            document.querySelectorAll('.code-block').forEach(btn => {
+                btn.classList.remove('used');
+            });
+        }
+        
+        function updateRobotPosition() {
+            // Clear all cells
+            document.querySelectorAll('.grid-cell').forEach(cell => {
+                cell.classList.remove('robot');
+                cell.textContent = '';
+            });
+            
+            // Update robot position
+            const robotCell = document.getElementById(`cell-${robotPosition.x}-${robotPosition.y}`);
+            if (robotCell) {
+                robotCell.classList.add('robot');
+                robotCell.textContent = '🤖';
+            }
+            
+            // Update targets
+            targetPositions.forEach(target => {
+                const targetCell = document.getElementById(`cell-${target.x}-${target.y}`);
+                if (targetCell && !targetCell.classList.contains('robot')) {
+                    targetCell.classList.add('target');
+                    targetCell.textContent = '💰';
+                }
+            });
+        }
+        
+        function runCode() {
+            robotPosition = { ...challenges[currentChallenge].robot };
+            targetPositions = [...challenges[currentChallenge].targets];
+            moveCount = 0;
+            
+            setupGrid();
+            updateRobotPosition();
+            
+            let currentAngle = 0; // 0=right, 1=down, 2=left, 3=up
+            let step = 0;
+            let inLoop = false;
+            let loopCount = 0;
+            let loopStart = 0;
+            let loopCommands = [];
+            
+            function executeNext() {
+                if (step >= sequence.length) {
+                    checkResult();
+                    return;
+                }
+                
+                const command = sequence[step];
+                
+                if (command.startsWith('for(')) {
+                    const count = parseInt(command.match(/\d+/)[0]);
+                    inLoop = true;
+                    loopCount = count;
+                    loopStart = step + 1;
+                    loopCommands = [];
+                    step++;
+                    executeNext();
+                } else if (inLoop) {
+                    if (command === 'endfor') {
+                        loopCount--;
+                        if (loopCount > 0) {
+                            step = loopStart;
+                        } else {
+                            inLoop = false;
+                            step++;
+                        }
+                        executeNext();
+                    } else {
+                        loopCommands.push(command);
+                        executeCommand(command, currentAngle);
+                        step++;
+                        if (step >= sequence.length || !sequence[step] || sequence[step].startsWith('for(')) {
+                            if (loopCount > 1) {
+                                loopCount--;
+                                step = loopStart;
+                            } else {
+                                inLoop = false;
+                            }
+                        }
+                        setTimeout(executeNext, 400);
+                    }
+                } else {
+                    executeCommand(command, currentAngle);
+                    step++;
+                    setTimeout(executeNext, 400);
+                }
+            }
+            
+            executeNext();
+        }
+        
+        function executeCommand(command, angle) {
+            moveCount++;
+            
+            if (command === 'move()') {
+                const dx = [1, 0, -1, 0][angle];
+                const dy = [0, 1, 0, -1][angle];
+                const newX = robotPosition.x + dx;
+                const newY = robotPosition.y + dy;
+                
+                if (newX >= 0 && newX < 5 && newY >= 0 && newY < 5) {
+                    const isObstacle = obstacles.some(o => o.x === newX && o.y === newY);
+                    if (!isObstacle) {
+                        robotPosition.x = newX;
+                        robotPosition.y = newY;
+                        updateRobotPosition();
+                    }
+                }
+            } else if (command === 'turnLeft()') {
+                currentAngle = (currentAngle + 3) % 4;
+            } else if (command === 'turnRight()') {
+                currentAngle = (currentAngle + 1) % 4;
+            } else if (command === 'jump()') {
+                const dx = [1, 0, -1, 0][angle];
+                const dy = [0, 1, 0, -1][angle];
+                const newX = robotPosition.x + dx * 2;
+                const newY = robotPosition.y + dy * 2;
+                
+                if (newX >= 0 && newX < 5 && newY >= 0 && newY < 5) {
+                    robotPosition.x = newX;
+                    robotPosition.y = newY;
+                    updateRobotPosition();
+                }
+            } else if (command === 'collect()') {
+                const index = targetPositions.findIndex(t => t.x === robotPosition.x && t.y === robotPosition.y);
+                if (index > -1) {
+                    targetPositions.splice(index, 1);
+                    updateRobotPosition();
+                }
+            }
+        }
+        
+        function checkResult() {
+            const challenge = challenges[currentChallenge];
+            
+            if (targetPositions.length === 0) {
+                // All coins collected!
+                let challengeScore = challenge.baseScore;
+                let challengeBonus = 0;
+                
+                // Calculate bonus for optimal solution
+                const optimalMoveCount = optimalMoves.length;
+                if (moveCount <= optimalMoveCount) {
+                    challengeBonus = 50;
+                } else if (moveCount <= optimalMoveCount + 2) {
+                    challengeBonus = 25;
+                }
+                
+                score += challengeScore;
+                bonusPoints += challengeBonus;
+                
+                document.getElementById('score').textContent = score;
+                document.getElementById('bonus').textContent = bonusPoints;
+                document.getElementById('total-score').textContent = score + bonusPoints;
+                
+                alert(`Perfect! You earned ${challengeScore} points${challengeBonus > 0 ? ' + ' + challengeBonus + ' bonus!' : ''} 🎉`);
+                
+                currentChallenge++;
+                setTimeout(() => {
+                    if (currentChallenge < challenges.length) {
+                        showChallenge();
+                    } else {
+                        endGame();
+                    }
+                }, 1500);
+            } else {
+                alert('Not all coins collected. Try again! 💪');
+            }
+        }
+        
+        function endGame() {
+            document.getElementById('game-area').style.display = 'none';
+            document.getElementById('game-over').classList.add('show');
+            
+            const totalScore = score + bonusPoints;
+            document.getElementById('final-score').textContent = totalScore;
+            
+            const bonusDisplay = document.getElementById('bonus-display');
+            if (bonusPoints > 0) {
+                bonusDisplay.innerHTML = `<div class="bonus-earned">⭐ Bonus Points Earned: ${bonusPoints} ⭐</div>`;
+            } else {
+                bonusDisplay.innerHTML = '';
+            }
+            
+            // Send score to parent window
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'GAME_SCORE',
+                    score: totalScore,
+                    level: 5,
+                    completed: true
+                }, '*');
+            }
+        }
+        
+        window.addEventListener('load', () => {
+            setTimeout(startGame, 500);
+        });
+    </script>
+</body>
+</html>
+

@@ -6,6 +6,7 @@ import Navbar from '../components/common/Navbar';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import Loading from '../components/common/Loading';
+import GameWrapper from '../components/games/GameWrapper';
 import { gamesAPI, childrenAPI } from '../services/api';
 import { getCategoryColor } from '../utils/helpers';
 
@@ -17,6 +18,8 @@ const GameDetailPage = () => {
   const [children, setChildren] = useState([]);
   const [selectedChild, setSelectedChild] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showGameWrapper, setShowGameWrapper] = useState(false);
+  const [sessionId, setSessionId] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -51,12 +54,34 @@ const GameDetailPage = () => {
     }
 
     try {
-      await gamesAPI.start(gameId, selectedChild);
-      // Open game in new window or navigate
-      window.open(game.gameUrl, '_blank');
+      const response = await gamesAPI.start(gameId, selectedChild);
+      const sessionId = response.data.data?.sessionId;
+      setSessionId(sessionId);
+
+      // Check if game is self-hosted (default to self-hosted if not specified)
+      if (game.gameType === 'self-hosted' || !game.gameType) {
+        // Show game wrapper for self-hosted games
+        setShowGameWrapper(true);
+      } else {
+        // Open external games in new window
+        window.open(game.gameUrl, '_blank');
+      }
     } catch (error) {
       console.error('Error starting game:', error);
+      alert('Failed to start game. Please try again.');
     }
+  };
+
+  const handleGameComplete = (result) => {
+    // Game completed, you can refresh data or show notification
+    console.log('Game completed:', result);
+    // Optionally refresh game data to show updated stats
+    fetchData();
+  };
+
+  const handleCloseGame = () => {
+    setShowGameWrapper(false);
+    setSessionId(null);
   };
 
   if (loading) {
@@ -78,6 +103,19 @@ const GameDetailPage = () => {
           </Card>
         </div>
       </>
+    );
+  }
+
+  // Show game wrapper if self-hosted game is being played
+  if (showGameWrapper && game && (game.gameType === 'self-hosted' || !game.gameType)) {
+    return (
+      <GameWrapper
+        game={game}
+        childId={selectedChild}
+        sessionId={sessionId}
+        onComplete={handleGameComplete}
+        onClose={handleCloseGame}
+      />
     );
   }
 

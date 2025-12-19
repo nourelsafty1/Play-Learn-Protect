@@ -65,10 +65,17 @@ const RegisterPage = () => {
       if (result.success) {
         navigate('/dashboard');
       } else {
-        setError(result.message || 'Registration failed');
+        // Show detailed error message
+        const errorMsg = result.message || result.errors?.[0]?.msg || 'Registration failed';
+        setError(errorMsg);
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      // Show specific validation errors from backend
+      const errorMsg = err.response?.data?.errors?.[0]?.msg 
+        || err.response?.data?.message 
+        || 'An error occurred. Please try again.';
+      setError(errorMsg);
+      console.error('Registration error:', err.response?.data);
     } finally {
       setLoading(false);
     }

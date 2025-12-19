@@ -395,10 +395,15 @@ exports.getMonitoringDashboard = async (req, res, next) => {
       resolved: false
     }).sort({ createdAt: -1 }).limit(10);
 
-    // Calculate total screen time today
-    const totalScreenTimeToday = todaySessions.reduce(
-      (sum, s) => sum + s.duration, 0
-    ) / 60;
+    // Calculate total screen time today (include active sessions with current duration)
+    const totalScreenTimeToday = todaySessions.reduce((sum, s) => {
+      let duration = s.duration;
+      // If session is active, calculate current duration
+      if (s.isActive && s.startTime) {
+        duration = Math.floor((Date.now() - s.startTime.getTime()) / 1000);
+      }
+      return sum + duration;
+    }, 0) / 60;
 
     // Get recent achievements
     const recentAchievements = [];

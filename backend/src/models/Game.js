@@ -61,6 +61,13 @@ const gameSchema = new mongoose.Schema({
     required: true // Link to where game is hosted
   },
   
+  // Game hosting type
+  gameType: {
+    type: String,
+    enum: ['self-hosted', 'external'],
+    default: 'self-hosted' // Default to self-hosted for full tracking
+  },
+  
   instructionsText: {
     type: String
   },

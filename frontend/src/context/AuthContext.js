@@ -57,7 +57,21 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true };
     } catch (err) {
-      const message = err.response?.data?.message || 'Login failed';
+      // Better error handling
+      let message = 'Login failed';
+      
+      if (err.response) {
+        // Server responded with error
+        message = err.response.data?.message || `Server error: ${err.response.status}`;
+      } else if (err.request) {
+        // Request made but no response (backend not running)
+        message = 'Cannot connect to server. Please make sure the backend is running on port 5000.';
+      } else {
+        // Error setting up request
+        message = err.message || 'An unexpected error occurred';
+      }
+      
+      console.error('Login error:', err);
       setError(message);
       return { success: false, message };
     }
@@ -76,9 +90,27 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true };
     } catch (err) {
-      const message = err.response?.data?.message || 'Registration failed';
+      // Better error handling - show specific validation errors
+      let message = 'Registration failed';
+      let errors = null;
+      
+      if (err.response?.data) {
+        errors = err.response.data.errors;
+        // Get first error message or use general message
+        if (errors && errors.length > 0) {
+          message = errors[0].msg || errors[0].message || message;
+        } else {
+          message = err.response.data.message || message;
+        }
+      } else if (err.request) {
+        message = 'Cannot connect to server. Please make sure the backend is running.';
+      } else {
+        message = err.message || message;
+      }
+      
+      console.error('Registration error:', err.response?.data || err);
       setError(message);
-      return { success: false, message };
+      return { success: false, message, errors };
     }
   };
 

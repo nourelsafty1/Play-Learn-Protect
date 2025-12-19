@@ -11,7 +11,8 @@ const {
   getGamesByCategory,
   getFeaturedGames,
   rateGame,
-  startGame
+  startGame,
+  completeGame
 } = require('../controllers/gameController');
 const { protect, authorize, optionalAuth } = require('../middleware/auth');
 const {
@@ -56,6 +57,14 @@ router.post(
   validateObjectId,
   validate,
   startGame
+);
+
+// Complete a game and submit score
+router.post(
+  '/:id/complete',
+  validateObjectId,
+  validate,
+  completeGame
 );
 
 // Rate a game

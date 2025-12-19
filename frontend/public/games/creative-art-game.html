@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Canvas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #ff9a9e;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        
+        .canvas-container {
+            border: 4px solid #ff9a9e;
+            border-radius: 15px;
+            margin: 20px 0;
+            background: white;
+        }
+        
+        canvas {
+            display: block;
+            cursor: crosshair;
+        }
+        
+        .tools {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        
+        .color-btn {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #333;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .color-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-btn.active {
+            border-color: #ff9a9e;
+            border-width: 5px;
+        }
+        
+        .control-btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+        }
+        
+        .clear-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .save-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .complete-btn {
+            background: #ff9a9e;
+            color: white;
+            font-size: 1.3em;
+            padding: 20px 40px;
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .game-over {
+            text-align: center;
+            display: none;
+        }
+        
+        .game-over.show {
+            display: block;
+        }
+        
+        .final-score {
+            font-size: 3em;
+            color: #ff9a9e;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎨 Creative Canvas</h1>
+        
+        <div class="instructions">
+            <p style="font-size: 1.2em; margin-bottom: 10px;">Create your masterpiece! Draw using the colors below.</p>
+            <p>When you're done, click "Complete Artwork" to save your creation!</p>
+        </div>
+        
+        <div id="game-area">
+            <div class="canvas-container">
+                <canvas id="canvas" width="800" height="500"></canvas>
+            </div>
+            
+            <div class="tools">
+                <div class="color-btn active" style="background: #000;" onclick="selectColor('#000')"></div>
+                <div class="color-btn" style="background: #ff0000;" onclick="selectColor('#ff0000')"></div>
+                <div class="color-btn" style="background: #00ff00;" onclick="selectColor('#00ff00')"></div>
+                <div class="color-btn" style="background: #0000ff;" onclick="selectColor('#0000ff')"></div>
+                <div class="color-btn" style="background: #ffff00;" onclick="selectColor('#ffff00')"></div>
+                <div class="color-btn" style="background: #ff00ff;" onclick="selectColor('#ff00ff')"></div>
+                <div class="color-btn" style="background: #00ffff;" onclick="selectColor('#00ffff')"></div>
+                <div class="color-btn" style="background: #ffa500;" onclick="selectColor('#ffa500')"></div>
+                <div class="color-btn" style="background: #800080;" onclick="selectColor('#800080')"></div>
+                <div class="color-btn" style="background: #ffc0cb;" onclick="selectColor('#ffc0cb')"></div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="control-btn clear-btn" onclick="clearCanvas()">Clear Canvas</button>
+                <button class="control-btn complete-btn" onclick="completeArtwork()">Complete Artwork ✨</button>
+            </div>
+        </div>
+        
+        <div class="game-over" id="game-over">
+            <div style="font-size: 5em; margin-bottom: 20px;">🎨</div>
+            <h2>Beautiful Artwork!</h2>
+            <div class="final-score">100%</div>
+            <p style="font-size: 1.2em; color: #666; margin-top: 10px;">Your creativity has been recorded!</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let currentColor = '#000';
+        let isDrawing = false;
+        let hasDrawn = false;
+        
+        // Set canvas background to white
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        function selectColor(color) {
+            currentColor = color;
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            hasDrawn = true;
+            const rect = canvas.getBoundingClientRect();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        function clearCanvas() {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            hasDrawn = false;
+        }
+        
+        function completeArtwork() {
+            if (!hasDrawn) {
+                alert('Please draw something first! 🎨');
+                return;
+            }
+            
+            document.getElementById('game-area').style.display = 'none';
+            document.getElementById('game-over').classList.add('show');
+            
+            // Creative games always get full points for participation
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'GAME_SCORE',
+                    score: 100, // Full points for creativity
+                    level: 1,
+                    completed: true
+                }, '*');
+            }
+        }
+        
+        // Touch support for mobile
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        });
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            const mouseEvent = new MouseEvent('mouseup', {});
+            canvas.dispatchEvent(mouseEvent);
+        });
+    </script>
+</body>
+</html>
+
