@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/common/Navbar';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
@@ -13,7 +14,8 @@ import { getCategoryColor } from '../utils/helpers';
 const GameDetailPage = () => {
   const { gameId } = useParams();
   const navigate = useNavigate();
-  
+  const { user } = useAuth();
+
   const [game, setGame] = useState(null);
   const [children, setChildren] = useState([]);
   const [selectedChild, setSelectedChild] = useState('');
@@ -33,10 +35,10 @@ const GameDetailPage = () => {
         gamesAPI.getOne(gameId),
         childrenAPI.getAll()
       ]);
-      
+
       setGame(gameRes.data.data);
       setChildren(childrenRes.data.data);
-      
+
       if (childrenRes.data.data.length > 0) {
         setSelectedChild(childrenRes.data.data[0]._id);
       }
@@ -122,10 +124,10 @@ const GameDetailPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100">
       <Navbar />
-      
+
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Button 
-          variant="secondary" 
+        <Button
+          variant="secondary"
           size="sm"
           onClick={() => navigate('/games')}
           className="mb-6"
@@ -144,14 +146,14 @@ const GameDetailPage = () => {
                 )}`}
               >
                 <div className="text-8xl">
-                   {game.category === 'Maths' && '🔢'}
-                    {game.category === 'Biology' && '🔬'}
-                    {game.category === 'Arabic' && '📚'}
-                    {game.category === 'English' && '📚'}
-                    {game.category === 'Coding' && '💻'}
-                    {game.category === 'Physics' && '⚛️'}
-                    {game.category === 'Chemistry' && '🧪'}
-                    {game.category === 'Creativity' && '🎨'}
+                  {game.category === 'Maths' && '🔢'}
+                  {game.category === 'Biology' && '🔬'}
+                  {game.category === 'Arabic' && '📚'}
+                  {game.category === 'English' && '📚'}
+                  {game.category === 'Coding' && '💻'}
+                  {game.category === 'Physics' && '⚛️'}
+                  {game.category === 'Chemistry' && '🧪'}
+                  {game.category === 'Creativity' && '🎨'}
                 </div>
 
                 <div className="absolute top-4 right-4 px-4 py-2 rounded-full bg-white bg-opacity-90 text-gray-800 font-semibold capitalize">
@@ -159,8 +161,10 @@ const GameDetailPage = () => {
                 </div>
               </div>
 
-              <h1 className="text-3xl font-bold text-gray-800 mb-4">{game.title}</h1>
-              
+              <h1 className="text-3xl font-bold text-gray-800 mb-4">
+                {(user?.language === 'ar' && game.titleArabic) ? game.titleArabic : game.title}
+              </h1>
+
               {/* Meta Info */}
               <div className="flex items-center gap-6 mb-6">
                 <div className="flex items-center gap-2">
@@ -181,18 +185,29 @@ const GameDetailPage = () => {
 
               {/* Description */}
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-2">About This Game</h3>
-                <p className="text-gray-600 leading-relaxed">{game.description}</p>
+                <h3 className="text-lg font-bold text-gray-800 mb-2">
+                  {user?.language === 'ar' ? 'حول هذه اللعبة' : 'About This Game'}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {(user?.language === 'ar' && game.descriptionArabic) ? game.descriptionArabic : game.description}
+                </p>
               </div>
 
               {/* Learning Objectives */}
-              {game.learningObjectives && game.learningObjectives.length > 0 && (
+              {((user?.language === 'ar' && game.learningObjectivesArabic?.length > 0) || (game.learningObjectives?.length > 0)) && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-bold text-gray-800 mb-2">Learning Objectives</h3>
+                  <h3 className="text-lg font-bold text-gray-800 mb-2">
+                    {user?.language === 'ar' ? 'أهداف التعلم' : 'Learning Objectives'}
+                  </h3>
                   <ul className="list-disc list-inside space-y-1 text-gray-600">
-                    {game.learningObjectives.map((objective, index) => (
-                      <li key={index}>{objective}</li>
-                    ))}
+                    {(user?.language === 'ar' && game.learningObjectivesArabic?.length > 0)
+                      ? game.learningObjectivesArabic.map((objective, index) => (
+                        <li key={index}>{objective}</li>
+                      ))
+                      : game.learningObjectives?.map((objective, index) => (
+                        <li key={index}>{objective}</li>
+                      ))
+                    }
                   </ul>
                 </div>
               )}
@@ -259,8 +274,8 @@ const GameDetailPage = () => {
               )}
 
               {/* Play Button */}
-              <Button 
-                fullWidth 
+              <Button
+                fullWidth
                 size="lg"
                 onClick={handleStartGame}
                 disabled={!selectedChild}

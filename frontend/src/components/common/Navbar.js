@@ -4,10 +4,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getInitials, getAvatarColor } from '../../utils/helpers';
+import { useTranslation } from '../../utils/translations';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleLogout = () => {
@@ -23,7 +25,7 @@ const Navbar = () => {
           <Link to="/dashboard" className="flex items-center space-x-2">
             <span className="text-3xl"></span>
             <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Play, Learn & Protect
+              {t('playLearnProtect')}
             </span>
           </Link>
 
@@ -33,26 +35,26 @@ const Navbar = () => {
               to="/dashboard"
               className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
             >
-              Dashboard
+              {t('dashboard')}
             </Link>
             <Link
               to="/games"
               className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
             >
-              Games
+              {t('games')}
             </Link>
             <Link
               to="/learning"
               className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
             >
-              Learning
+              {t('learning')}
             </Link>
             {(user?.role === 'parent' || user?.role === 'teacher') && (
               <Link
                 to="/monitoring"
                 className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
               >
-                Monitoring
+                {t('monitoring')}
               </Link>
             )}
           </div>
@@ -68,7 +70,7 @@ const Navbar = () => {
               </div>
               <div className="hidden md:block text-left">
                 <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
-                <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+                <p className="text-xs text-gray-500">{t(user?.role)}</p>
               </div>
               <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -83,21 +85,21 @@ const Navbar = () => {
                   className="block px-4 py-2 text-gray-700 hover:bg-purple-50 transition-colors"
                   onClick={() => setShowDropdown(false)}
                 >
-                  👤 My Profile
+                  👤 {t('profile')}
                 </Link>
                 <Link
                   to="/settings"
                   className="block px-4 py-2 text-gray-700 hover:bg-purple-50 transition-colors"
                   onClick={() => setShowDropdown(false)}
                 >
-                  ⚙️ Settings
+                  ⚙️ {t('settings')}
                 </Link>
                 <hr className="my-2" />
                 <button
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
                 >
-                  🚪 Logout
+                  🚪 {t('logout')}
                 </button>
               </div>
             )}

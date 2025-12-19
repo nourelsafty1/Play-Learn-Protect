@@ -22,7 +22,9 @@ exports.validateRegister = [
     .notEmpty()
     .withMessage('Name is required')
     .isLength({ min: 2, max: 50 })
-    .withMessage('Name must be between 2 and 50 characters'),
+    .withMessage('Name must be between 2 and 50 characters')
+    .matches(/^[\u0600-\u06FFa-zA-Z0-9_ ]+$/)
+    .withMessage('Name can contain letters, numbers, and spaces'),
 
   body('email')
     .trim()
@@ -66,7 +68,9 @@ exports.validateCreateChild = [
     .notEmpty()
     .withMessage('Child name is required')
     .isLength({ min: 2, max: 50 })
-    .withMessage('Name must be between 2 and 50 characters'),
+    .withMessage('Name must be between 2 and 50 characters')
+    .matches(/^[\u0600-\u06FFa-zA-Z0-9_ ]+$/)
+    .withMessage('Name can contain letters, numbers, and spaces'),
 
   body('username')
     .trim()
@@ -74,8 +78,8 @@ exports.validateCreateChild = [
     .withMessage('Username is required')
     .isLength({ min: 3, max: 20 })
     .withMessage('Username must be between 3 and 20 characters')
-    .matches(/^[a-zA-Z0-9_]+$/)
-    .withMessage('Username can only contain letters, numbers, and underscores'),
+    .matches(/^[\u0600-\u06FFa-zA-Z0-9_]+$/)
+    .withMessage('Username can contain letters, numbers, and underscores'),
 
   body('dateOfBirth')
     .notEmpty()
@@ -127,7 +131,9 @@ exports.validateCreateGame = [
     .notEmpty()
     .withMessage('Game title is required')
     .isLength({ max: 100 })
-    .withMessage('Title cannot exceed 100 characters'),
+    .withMessage('Title cannot exceed 100 characters')
+    .matches(/^[\u0600-\u06FFa-zA-Z0-9_\- ]+$/)
+    .withMessage('Title can contain letters, numbers, and common symbols'),
 
   body('description')
     .trim()
@@ -254,6 +260,8 @@ exports.validateContentFlag = [
     .trim()
     .notEmpty()
     .withMessage('Content description is required')
+    .matches(/^[\u0600-\u06FFa-zA-Z0-9_\-\. ]+$/)
+    .withMessage('Description can contain letters, numbers, and common symbols'),
 ];
 
 // Validation for rating/feedback

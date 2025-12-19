@@ -197,7 +197,9 @@ const LearningDetailPage = () => {
                 </div>
               </div>
 
-              <h1 className="text-3xl font-bold text-gray-800 mb-4">{module.title}</h1>
+              <h1 className="text-3xl font-bold text-gray-800 mb-4">
+                {(user?.language === 'ar' && module.titleArabic) ? module.titleArabic : module.title}
+              </h1>
 
               {/* Progress Bar - Only for parents */}
               {user?.role === 'parent' && progress && (
@@ -235,18 +237,29 @@ const LearningDetailPage = () => {
 
               {/* Description */}
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-2">About This Course</h3>
-                <p className="text-gray-600 leading-relaxed">{module.description}</p>
+                <h3 className="text-lg font-bold text-gray-800 mb-2">
+                  {user?.language === 'ar' ? 'حول هذه الدورة' : 'About This Course'}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {(user?.language === 'ar' && module.descriptionArabic) ? module.descriptionArabic : module.description}
+                </p>
               </div>
 
               {/* Learning Objectives */}
-              {module.learningObjectives && module.learningObjectives.length > 0 && (
+              {((user?.language === 'ar' && module.learningObjectivesArabic?.length > 0) || (module.learningObjectives?.length > 0)) && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-bold text-gray-800 mb-2">What You'll Learn</h3>
+                  <h3 className="text-lg font-bold text-gray-800 mb-2">
+                    {user?.language === 'ar' ? 'ماذا ستتعلم' : "What You'll Learn"}
+                  </h3>
                   <ul className="list-disc list-inside space-y-1 text-gray-600">
-                    {module.learningObjectives.map((objective, index) => (
-                      <li key={index}>{objective}</li>
-                    ))}
+                    {(user?.language === 'ar' && module.learningObjectivesArabic?.length > 0)
+                      ? module.learningObjectivesArabic.map((objective, index) => (
+                        <li key={index}>{objective}</li>
+                      ))
+                      : module.learningObjectives?.map((objective, index) => (
+                        <li key={index}>{objective}</li>
+                      ))
+                    }
                   </ul>
                 </div>
               )}
@@ -276,7 +289,9 @@ const LearningDetailPage = () => {
                               {isCompleted ? '✓' : lesson.lessonNumber}
                             </div>
                             <div className="flex-1">
-                              <h4 className="font-semibold text-gray-800">{lesson.title}</h4>
+                              <h4 className="font-semibold text-gray-800">
+                                {(user?.language === 'ar' && lesson.titleArabic) ? lesson.titleArabic : lesson.title}
+                              </h4>
                               <p className="text-sm text-gray-500">
                                 {lesson.contentType} • {lesson.duration} min
                               </p>

@@ -16,7 +16,7 @@ const generateToken = (id) => {
 // @access  Public
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, password, role, phone } = req.body;
+    const { name, email, password, role, phone, language } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -33,7 +33,8 @@ exports.register = async (req, res, next) => {
       email,
       password,
       role: role || 'parent',
-      phone
+      phone,
+      language: language || 'ar'
     });
 
     // Generate token
@@ -148,7 +149,7 @@ exports.updateDetails = async (req, res, next) => {
     };
 
     // Remove undefined fields
-    Object.keys(fieldsToUpdate).forEach(key => 
+    Object.keys(fieldsToUpdate).forEach(key =>
       fieldsToUpdate[key] === undefined && delete fieldsToUpdate[key]
     );
 
@@ -255,7 +256,7 @@ exports.logout = async (req, res, next) => {
   try {
     // In a JWT-based system, logout is handled client-side by removing the token
     // But we can log the action here if needed
-    
+
     res.status(200).json({
       success: true,
       message: 'Logged out successfully'
