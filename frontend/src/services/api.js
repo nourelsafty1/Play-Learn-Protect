@@ -137,7 +137,7 @@ export const progressAPI = {
 // ======================
 
 export const monitoringAPI = {
-  getDashboard: () => api.get('/monitoring/dashboard'),
+  getDashboard: (period) => api.get('/monitoring/dashboard', { params: period ? { period } : {} }),
   startSession: (childId, deviceType) => api.post('/monitoring/sessions/start', { childId, deviceType }),
   endSession: (sessionId) => api.post(`/monitoring/sessions/${sessionId}/end`),
   addActivity: (sessionId, activityData) => api.post(`/monitoring/sessions/${sessionId}/activity`, activityData),

@@ -23,6 +23,7 @@ const LearningDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(null);
   const [completingLesson, setCompletingLesson] = useState(null);
+  const [remainingTime, setRemainingTime] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -49,6 +50,17 @@ const LearningDetailPage = () => {
 
         if (childrenRes.data.data.length > 0) {
           setSelectedChild(childrenRes.data.data[0]._id);
+        }
+
+        // Fetch remaining screen time for first child
+        const child = childrenRes.data.data[0];
+        if (child && child.dailyScreenTimeLimit !== undefined && child.screenTimeToday !== undefined) {
+          setRemainingTime(Math.max(0, child.dailyScreenTimeLimit - (child.screenTimeToday || 0)));
+        } else if (child) {
+          // fallback: fetch from monitoringAPI
+          const screenTimeRes = await monitoringAPI.getScreenTime(child._id, 1);
+          const used = screenTimeRes.data.data?.totalTime || 0;
+          setRemainingTime(Math.max(0, (child.dailyScreenTimeLimit || 120) - used));
         }
       }
     } catch (error) {
@@ -177,6 +189,16 @@ const LearningDetailPage = () => {
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Show remaining screen time */}
+        {remainingTime !== null && (
+          <div className="mb-4 p-4 bg-blue-50 rounded-lg text-center">
+            <span className="text-lg font-semibold text-blue-700">
+              {remainingTime > 0
+                ? `${t('screenTimeRemaining')}: ${remainingTime} ${t('min')}`
+                : t('screenTimeLimitReached')}
+            </span>
+          </div>
+        )}
         <Button
           variant="secondary"
           size="sm"

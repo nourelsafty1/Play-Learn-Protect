@@ -1,0 +1,12 @@
+# SRS Document
+
+This file is a placeholder for your Software Requirements Specification (SRS) document. Please place your Word document (e.g., Play-Learn-Protect-SRS.docx) in the root directory of the project. Reference it in the README for easy access.
+
+---
+
+To include your SRS document:
+- Place your .docx file here.
+- Mention it in the README under 'Including SRS Document'.
+
+Example:
+- Play-Learn-Protect-SRS.docx

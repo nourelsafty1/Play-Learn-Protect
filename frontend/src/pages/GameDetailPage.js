@@ -24,6 +24,7 @@ const GameDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [showGameWrapper, setShowGameWrapper] = useState(false);
   const [sessionId, setSessionId] = useState(null);
+  const [remainingTime, setRemainingTime] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -43,6 +44,19 @@ const GameDetailPage = () => {
 
       if (childrenRes.data.data.length > 0) {
         setSelectedChild(childrenRes.data.data[0]._id);
+      }
+
+      // Fetch remaining screen time for first child
+      if (childrenRes.data.data.length > 0) {
+        const child = childrenRes.data.data[0];
+        if (child.dailyScreenTimeLimit !== undefined && child.screenTimeToday !== undefined) {
+          setRemainingTime(Math.max(0, child.dailyScreenTimeLimit - (child.screenTimeToday || 0)));
+        } else {
+          // fallback: fetch from monitoringAPI
+          const screenTimeRes = await monitoringAPI.getScreenTime(child._id, 1);
+          const used = screenTimeRes.data.data?.totalTime || 0;
+          setRemainingTime(Math.max(0, (child.dailyScreenTimeLimit || 120) - used));
+        }
       }
     } catch (error) {
       console.error('Error fetching game:', error);
@@ -147,6 +161,17 @@ const GameDetailPage = () => {
         >
           ← {t('backToGames')}
         </Button>
+
+        {/* Show remaining screen time */}
+        {remainingTime !== null && (
+          <div className="mb-4 p-4 bg-blue-50 rounded-lg text-center">
+            <span className="text-lg font-semibold text-blue-700">
+              {remainingTime > 0
+                ? `${t('screenTimeRemaining')}: ${remainingTime} ${t('min')}`
+                : t('screenTimeLimitReached')}
+            </span>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
@@ -298,7 +323,7 @@ const GameDetailPage = () => {
                 fullWidth
                 size="lg"
                 onClick={handleStartGame}
-                disabled={!selectedChild}
+                disabled={!selectedChild || remainingTime === 0}
               >
                 <span className="text-2xl"></span>
                 <span>{t('playNow')}</span>

@@ -409,6 +409,7 @@ exports.getMonitoringDashboard = async (req, res, next) => {
   try {
     const user = req.user;
 
+
     // Get all children for this user
     const children = await Child.find({
       $or: [
@@ -420,19 +421,21 @@ exports.getMonitoringDashboard = async (req, res, next) => {
 
     const childIds = children.map(c => c._id);
 
-    // Get today's date
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Support period selection (default 7 days)
+    const period = parseInt(req.query.period) || 7;
+    const periodStart = new Date();
+    periodStart.setHours(0, 0, 0, 0);
+    periodStart.setDate(periodStart.getDate() - (period - 1));
 
-    // Get today's sessions with activities populated
-    const todaySessions = await Session.find({
+    // Get sessions in the selected period
+    const periodSessions = await Session.find({
       child: { $in: childIds },
-      startTime: { $gte: today }
+      startTime: { $gte: periodStart }
     }).populate('activities.game', 'title category').populate('activities.learningModule', 'title subject');
 
-    // Get all activities from today's sessions
+    // Get all activities from sessions in period
     const allActivities = [];
-    todaySessions.forEach(session => {
+    periodSessions.forEach(session => {
       if (session.activities && session.activities.length > 0) {
         session.activities.forEach(activity => {
           allActivities.push({
@@ -445,6 +448,7 @@ exports.getMonitoringDashboard = async (req, res, next) => {
       }
     });
 
+
     // Sort activities by start time (most recent first)
     allActivities.sort((a, b) => {
       const timeA = a.startTime ? new Date(a.startTime).getTime() : new Date(a.sessionStartTime).getTime();
@@ -452,27 +456,28 @@ exports.getMonitoringDashboard = async (req, res, next) => {
       return timeB - timeA;
     });
 
+
     // Get unresolved alerts
     const unresolvedAlerts = await Alert.find({
       child: { $in: childIds },
       resolved: false
     }).sort({ createdAt: -1 }).limit(10);
 
-    // Calculate total screen time today (include active sessions with current duration)
-    const totalScreenTimeToday = todaySessions.reduce((sum, s) => {
+    // Calculate total screen time in period (include active sessions with current duration)
+    const totalScreenTimePeriod = periodSessions.reduce((sum, s) => {
       let duration = s.duration;
-      // If session is active, calculate current duration
       if (s.isActive && s.startTime) {
         duration = Math.floor((Date.now() - s.startTime.getTime()) / 1000);
       }
       return sum + duration;
     }, 0) / 60;
 
-    // Get recent achievements
+
+    // Get recent achievements (last 7 days)
     const recentAchievements = [];
     for (const child of children) {
       const recent = child.achievements
-        .filter(a => a.earnedAt >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+        .filter(a => a.earnedAt >= periodStart)
         .map(a => ({
           child: { name: child.name, avatar: child.avatar },
           achievement: a.achievement,
@@ -494,8 +499,8 @@ exports.getMonitoringDashboard = async (req, res, next) => {
       data: {
         summary: {
           totalChildren: children.length,
-          activeSessions: todaySessions.filter(s => s.isActive).length,
-          totalScreenTimeToday: Math.round(totalScreenTimeToday),
+          activeSessions: periodSessions.filter(s => s.isActive).length,
+          totalScreenTimePeriod: Math.round(totalScreenTimePeriod),
           unresolvedAlerts: unresolvedAlerts.length,
           highRiskChildren: highRiskChildren
         },

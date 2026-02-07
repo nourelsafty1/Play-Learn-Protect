@@ -37,6 +37,7 @@ const MonitoringPage = () => {
     if (selectedChild) {
       fetchAnalytics();
     }
+    fetchDashboard(); // refetch dashboard when period changes
   }, [selectedChild, period]);
 
   const fetchChildren = async () => {
@@ -63,7 +64,7 @@ const MonitoringPage = () => {
 
   const fetchDashboard = async () => {
     try {
-      const response = await monitoringAPI.getDashboard();
+      const response = await monitoringAPI.getDashboard(period);
       setDashboardData(response.data.data);
     } catch (error) {
       console.error('Error fetching dashboard:', error);

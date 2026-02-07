@@ -24,10 +24,16 @@ const DetailedMonitoringPage = () => {
   const fetchAllData = useCallback(async () => {
     try {
       setLoading(true);
-      
+      setError(null);
       // Fetch child info
       const childrenRes = await childrenAPI.getAll();
       const childData = childrenRes.data.data.find(c => c._id === childId);
+      if (!childData) {
+        setChild(null);
+        setError('Child not found or you do not have access.');
+        setLoading(false);
+        return;
+      }
       setChild(childData);
 
       // Fetch all analytics
@@ -43,7 +49,6 @@ const DetailedMonitoringPage = () => {
       setSafetyData(safety.data.data);
       setSessions(sessionsRes.data.data || []);
       setError(null);
-
     } catch (error) {
       console.error('Error fetching detailed data:', error);
       setError(error.response?.data?.message || 'Failed to load data. Please try again.');
@@ -67,7 +72,7 @@ const DetailedMonitoringPage = () => {
     );
   }
 
-  if (!child) {
+  if (error || !child) {
     return (
       <>
         <Navbar />
@@ -75,7 +80,7 @@ const DetailedMonitoringPage = () => {
           <Card>
             <div className="text-center py-12">
               <div className="text-6xl mb-4">❌</div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">Child not found</h3>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">{error || 'Child not found'}</h3>
               <Button onClick={() => navigate('/monitoring')}>Back to Monitoring</Button>
             </div>
           </Card>
